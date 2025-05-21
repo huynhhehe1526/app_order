@@ -1,28 +1,34 @@
+import 'package:dt02_nhom09/screens/login_screen.dart';
+import 'package:dt02_nhom09/screens/orderscreen.dart';
+import 'package:dt02_nhom09/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dt02_nhom09/slashscreen.dart';
+import 'package:dt02_nhom09/screens/slashscreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:dt02_nhom09/menu.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
+import 'package:dt02_nhom09/screens/menu.dart';
+import 'package:dt02_nhom09/class/gridItem_custom_class.dart';
 
-class GirdItem {
-  final String title;
-  final Widget icon;
+// class GirdItem {
+//   final String title;
+//   final Widget icon;
 
-  GirdItem({required this.title, required this.icon});
-}
+//   GirdItem({required this.title, required this.icon});
+// }
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> featuredItems = [
-    // {'name': 'Phở Bò', 'price': 50000, 'image': 'assets/images/pho_bo.jpg'},
-    // {'name': 'Trà Đào', 'price': 35000, 'image': 'assets/images/tra_dao.jpg'},
-    // {'name': 'Bún Bò', 'price': 55000, 'image': 'assets/images/bun_bo.jpg'},
+    {'name': 'Phở Bò', 'price': 50000, 'image': 'assets/images/pho_bo.jpg'},
+    {'name': 'Trà Đào', 'price': 35000, 'image': 'assets/images/tra_dao.jpg'},
+    {'name': 'Bún Bò', 'price': 55000, 'image': 'assets/images/bun_bo.jpg'},
     {
       'name': 'Cheese Cake',
       'price': 45000,
@@ -40,52 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  List<GirdItem> lst = [
-    GirdItem(
-      title: 'Đặt bàn',
-      icon: FaIcon(
-        FontAwesomeIcons.calendarAlt,
-        size: 40,
-        color: Colors.deepOrange,
-      ),
-    ),
-    GirdItem(
-      title: 'Thực đơn',
-      icon: FaIcon(FontAwesomeIcons.utensils, size: 40, color: Colors.green),
-    ),
-    GirdItem(
-      title: 'Thanh toán',
-      icon: FaIcon(FontAwesomeIcons.creditCard, size: 40, color: Colors.blue),
-    ),
-    GirdItem(
-      title: 'Đơn hàng',
-      icon: FaIcon(
-        FontAwesomeIcons.clipboardList,
-        size: 40,
-        color: Colors.purple,
-      ),
-    ),
-    GirdItem(
-      title: 'Quản lý nhân viên',
-      icon: FaIcon(FontAwesomeIcons.users, size: 40, color: Colors.brown),
-    ),
-    GirdItem(
-      title: 'Thống kê doanh thu',
-      icon: FaIcon(FontAwesomeIcons.chartBar, size: 40, color: Colors.teal),
-    ),
-    GirdItem(
-      title: 'Phản hồi của khách hàng',
-      icon: FaIcon(FontAwesomeIcons.comments, size: 40, color: Colors.pink),
-    ),
-    GirdItem(
-      title: 'Cài đặt',
-      icon: FaIcon(FontAwesomeIcons.cog, size: 40, color: Colors.grey),
-    ),
-    GirdItem(
-      title: 'Xem thêm',
-      icon: FaIcon(FontAwesomeIcons.ellipsisH, size: 40),
-    ),
-  ];
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -98,11 +58,76 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(builder: (context) => MenuScreen()),
       );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    List<GirdItem> lst = [
+      GirdItem(
+        title: 'Đặt bàn',
+        icon: FaIcon(
+          FontAwesomeIcons.calendarAlt,
+          size: 40,
+          color: Colors.deepOrange,
+        ),
+      ),
+      GirdItem(
+        title: 'Thực đơn',
+        icon: FaIcon(FontAwesomeIcons.utensils, size: 40, color: Colors.green),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MenuScreen()),
+          );
+        },
+      ),
+
+      GirdItem(
+        title: 'Thanh toán',
+        icon: FaIcon(FontAwesomeIcons.creditCard, size: 40, color: Colors.blue),
+      ),
+      GirdItem(
+        title: 'Đơn hàng',
+        icon: FaIcon(
+          FontAwesomeIcons.clipboardList,
+          size: 40,
+          color: Colors.purple,
+        ),
+        onTap:
+            () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => OrderScreen()),
+              ),
+            },
+      ),
+      GirdItem(
+        title: 'Quản lý nhân viên',
+        icon: FaIcon(FontAwesomeIcons.users, size: 40, color: Colors.brown),
+      ),
+      GirdItem(
+        title: 'Thống kê doanh thu',
+        icon: FaIcon(FontAwesomeIcons.chartBar, size: 40, color: Colors.teal),
+      ),
+      GirdItem(
+        title: 'Phản hồi của khách hàng',
+        icon: FaIcon(FontAwesomeIcons.comments, size: 40, color: Colors.pink),
+      ),
+      GirdItem(
+        title: 'Cài đặt',
+        icon: FaIcon(FontAwesomeIcons.cog, size: 40, color: Colors.grey),
+      ),
+      GirdItem(
+        title: 'Xem thêm',
+        icon: FaIcon(FontAwesomeIcons.ellipsisH, size: 40),
+      ),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Text('Trang chủ'),
@@ -141,12 +166,27 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Cài đặt'),
+              onTap: () {
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => HomeScreen()),
+                // );
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text('Thoát'),
               onTap: () {
-                Navigator.pushReplacement(
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => SplashScreen()),
+                // );
+                Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => SplashScreen()),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
                 );
               },
             ),
@@ -223,46 +263,43 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: () {},
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.transparent,
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ClipOval(
-                              child: Container(
-                                color: Colors.white,
-                                width: 60,
-                                height: 60,
-                                padding: EdgeInsets.all(8),
-                                child: Center(child: lst[index].icon),
-                              ),
+                  onTap: lst[index].onTap,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.transparent,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipOval(
+                            child: Container(
+                              color: Colors.white,
+                              width: 60,
+                              height: 60,
+                              padding: EdgeInsets.all(8),
+                              child: Center(child: lst[index].icon),
                             ),
-                            SizedBox(height: 5),
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  lst[index].title,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.5,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
+                          ),
+                          SizedBox(height: 5),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                lst[index].title,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.5,
                                 ),
+                                textAlign: TextAlign.center,
+                                softWrap: true,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -377,41 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang Chủ'),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.menu_book),
-      //       label: 'Thực Đơn',
-      //     ),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tài Khoản'),
-      //   ],
-      //   selectedItemColor: Colors.brown,
-      //   unselectedItemColor: Colors.grey,
-      //   backgroundColor: Colors.white,
-      // ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: 0, // Mặc định chọn Trang Chủ
-      //   onTap: (index) {
-      //     if (index == 1) {
-      //       Navigator.push(
-      //         context,
-      //         MaterialPageRoute(builder: (context) => MenuScreen()),
-      //       );
-      //     }
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang Chủ'),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.menu_book),
-      //       label: 'Thực Đơn',
-      //     ),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tài Khoản'),
-      //   ],
-      //   selectedItemColor: const Color.fromARGB(255, 85, 2, 2),
-      //   unselectedItemColor: Colors.grey,
-      //   backgroundColor: Colors.white,
-      // ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
