@@ -5,9 +5,9 @@ class EditProfileScreen extends StatefulWidget {
   final String email;
   final String phone;
   final String address;
-  final String birthday;
-  final String gender;
-  final String description;
+  // final String birthday;
+  // final String gender;
+  // final String description;
 
   const EditProfileScreen({
     super.key,
@@ -15,9 +15,9 @@ class EditProfileScreen extends StatefulWidget {
     required this.email,
     required this.phone,
     required this.address,
-    required this.birthday,
-    required this.gender,
-    required this.description,
+    // required this.birthday,
+    // required this.gender,
+    // required this.description,
   });
 
   @override
@@ -29,9 +29,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController emailController;
   late TextEditingController phoneController;
   late TextEditingController addressController;
-  late TextEditingController birthdayController;
-  late TextEditingController genderController;
-  late TextEditingController descriptionController;
+  // late TextEditingController birthdayController;
+  // late TextEditingController genderController;
+  // late TextEditingController descriptionController;
 
   @override
   void initState() {
@@ -40,9 +40,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     emailController = TextEditingController(text: widget.email);
     phoneController = TextEditingController(text: widget.phone);
     addressController = TextEditingController(text: widget.address);
-    birthdayController = TextEditingController(text: widget.birthday);
-    genderController = TextEditingController(text: widget.gender);
-    descriptionController = TextEditingController(text: widget.description);
+    // birthdayController = TextEditingController(text: widget.birthday);
+    // genderController = TextEditingController(text: widget.gender);
+    // descriptionController = TextEditingController(text: widget.description);
   }
 
   void _saveProfile() {
@@ -51,9 +51,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       'email': emailController.text,
       'phone': phoneController.text,
       'address': addressController.text,
-      'birthday': birthdayController.text,
-      'gender': genderController.text,
-      'description': descriptionController.text,
+      // 'birthday': birthdayController.text,
+      // 'gender': genderController.text,
+      // 'description': descriptionController.text,
     });
   }
 
@@ -84,18 +84,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               controller: addressController,
               decoration: const InputDecoration(labelText: 'Địa chỉ'),
             ),
-            TextField(
-              controller: birthdayController,
-              decoration: const InputDecoration(labelText: 'Ngày sinh'),
-            ),
-            TextField(
-              controller: genderController,
-              decoration: const InputDecoration(labelText: 'Giới tính'),
-            ),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Mô tả'),
-            ),
+            // TextField(
+            //   controller: birthdayController,
+            //   decoration: const InputDecoration(labelText: 'Ngày sinh'),
+            // ),
+            // TextField(
+            //   controller: genderController,
+            //   decoration: const InputDecoration(labelText: 'Giới tính'),
+            // ),
+            // TextField(
+            //   controller: descriptionController,
+            //   decoration: const InputDecoration(labelText: 'Mô tả'),
+            // ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _saveProfile,

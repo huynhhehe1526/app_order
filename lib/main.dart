@@ -1,4 +1,5 @@
 // import 'package:dt02_nhom09/screens/login_screen.dart';
+import 'package:dt02_nhom09/screens/chef_screen.dart';
 import 'package:dt02_nhom09/screens/home.dart';
 import 'package:dt02_nhom09/screens/login_screen.dart';
 import 'package:dt02_nhom09/screens/menu.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => SigninScreen(),
         '/tables': (context) => TableScreen(),
         '/menu': (context) => MenuScreen(),
+        // '/chef':(context) => ChefScreen(chefId: chefId)
         // '/order': (context) => OrderScreen(),
         // '/payment': (context) => PaymentScreen(),
         // '/order_detail': (context) => OrderDetailScreen(),
@@ -99,10 +101,11 @@ class MyApp extends StatelessWidget {
                 ),
           );
         } else if (settings.name == '/profile') {
-          final args = settings.arguments as Map<String, String>;
-          return MaterialPageRoute(
-            builder: (_) => ProfileScreen(id: int.parse(args['id']!)),
-          );
+          final id = settings.arguments as int;
+          return MaterialPageRoute(builder: (_) => ProfileScreen(id: id));
+        } else if (settings.name == '/chef') {
+          final id = settings.arguments as int;
+          return MaterialPageRoute(builder: (_) => ChefScreen(chefId: id));
         }
         return null;
       },

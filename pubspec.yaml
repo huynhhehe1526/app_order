@@ -41,6 +41,7 @@ dependencies:
   fluttertoast: ^8.2.12
   another_flushbar: ^1.12.30
   toastification: ^3.0.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
