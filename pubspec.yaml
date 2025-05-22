@@ -38,6 +38,9 @@ dependencies:
   flutter_svg: ^2.0.17
   carousel_slider: ^5.0.0
   font_awesome_flutter: ^10.8.0
+  fluttertoast: ^8.2.12
+  another_flushbar: ^1.12.30
+  toastification: ^3.0.2
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +91,16 @@ flutter:
     - assets/images/banh_flan.jpg
     - assets/images/cheese_cake.jpg
     - assets/images/dienthoai-2-675x1200-26.jpg
+    - assets/images/hinh-nen-may-tinh-4k-7.jpg
+    # logo
+    - assets/logo/logo_acb.png
+    - assets/logo/logo_mbbank.png
+    - assets/logo/logo_tpbank.jpg
+    - assets/logo/logo_vcbank.png
+    - assets/logo/logo_bidv.jpg
+    - assets/logo/logo_argibank.webp
+    - assets/logo/logo_vettinbank.webp
+    - assets/logo/logo_techcombank.jpg
 
   #   - images/a_dot_ham.jpeg
 

@@ -10,21 +10,149 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // final List<Map<String, String>> users = [
+  //   {
+  //     'email': 'quanly@gmail.com',
+  //     'password': '123456',
+  //     'name': 'Nguyễn Văn Quản',
+  //     'role': 'Quản lý',
+  //   },
+  //   {
+  //     'email': 'phucvu@gmail.com',
+  //     'password': '123456',
+  //     'name': 'Trần Thị Phục',
+  //     'role': 'Nhân viên phục vụ',
+  //   },
+  //   {
+  //     'email': 'bep@gmail.com',
+  //     'password': '123456',
+  //     'name': 'Lê Văn Bếp',
+  //     'role': 'Nhân viên bếp',
+  //   },
+  //   {
+  //     'email': 'khach@gmail.com',
+  //     'password': '123456',
+  //     'name': 'Phạm Khách Hàng',
+  //     'role': 'Khách hàng',
+  //   },
+  // ];
+  final List<Map<String, String>> users = [
+    {
+      'id': '1',
+      'username': 'quanly01',
+      'password': '123456',
+      'fullname': 'Nguyễn Văn Quản',
+      'role': 'Quản lý',
+      'phone': '0911111111',
+      'email': 'quanly@gmail.com',
+      'address': '123 Quản Lý, TP.HCM',
+    },
+    {
+      'id': '2',
+      'username': 'phucvu01',
+      'password': '123456',
+      'fullname': 'Trần Thị Phục',
+      'role': 'Nhân viên phục vụ',
+      'phone': '0922222222',
+      'email': 'phucvu@gmail.com',
+      'address': '456 Phục Vụ, TP.HCM',
+    },
+    {
+      'id': '3',
+      'username': 'bep01',
+      'password': '123456',
+      'fullname': 'Lê Văn Bếp',
+      'role': 'Bếp',
+      'phone': '0933333333',
+      'email': 'bep@gmail.com',
+      'address': '789 Bếp Nấu, TP.HCM',
+    },
+    {
+      'id': '4',
+      'username': 'khach01',
+      'password': '123456',
+      'fullname': 'Phạm Khách Hàng',
+      'role': 'Khách hàng',
+      'phone': '0944444444',
+      'email': 'khach@gmail.com',
+      'address': '101 Khách, TP.HCM',
+    },
+    {
+      'id': '5',
+      'username': 'phucvu02',
+      'password': '123456',
+      'fullname': 'Ngô Minh Phục',
+      'role': 'Nhân viên phục vụ',
+      'phone': '0955555555',
+      'email': 'phucvu2@gmail.com',
+      'address': '102 Phục Vụ, TP.HCM',
+    },
+  ];
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
+  // void _handleLogin() {
+  //   if (_formKey.currentState!.validate()) {
+  //     // Nếu hợp lệ thì chuyển sang ProfileScreen
+  //     Navigator.push(
+  //       context,
+  //       // MaterialPageRoute(builder: (context) => ProfileScreen()),
+  //       MaterialPageRoute(builder: (context) => HomeScreen()),
+  //     );
+  //   } else {
+  //     // Nếu chưa hợp lệ thì hiện thông báo lỗi
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Vui lòng nhập đầy đủ email và mật khẩu'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      // Nếu hợp lệ thì chuyển sang ProfileScreen
-      Navigator.push(
-        context,
-        // MaterialPageRoute(builder: (context) => ProfileScreen()),
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+
+      final user = users.firstWhere(
+        (u) => u['email'] == email && u['password'] == password,
+        orElse: () => {},
       );
+
+      if (user.isNotEmpty) {
+        final id = user['id']!;
+        final role = user['role']!;
+        final name = user['fullname']!;
+
+        // Thông báo
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Chào $name - $role'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Chuyển sang trang Home (hoặc tuỳ vai trò có thể chuyển trang khác nhau)
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(id: int.parse(id),name: name, role: role),
+          ),
+        );
+      } else {
+        // Sai tài khoản hoặc mật khẩu
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sai email hoặc mật khẩu!'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
-      // Nếu chưa hợp lệ thì hiện thông báo lỗi
+      // Form chưa hợp lệ
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng nhập đầy đủ email và mật khẩu'),

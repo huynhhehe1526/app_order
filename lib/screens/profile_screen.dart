@@ -3,7 +3,8 @@ import 'edit_profile_screen.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final int id;
+  const ProfileScreen({super.key, required this.id});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();

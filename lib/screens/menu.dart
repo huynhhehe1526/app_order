@@ -109,6 +109,7 @@ class MenuScreen extends StatelessWidget {
     },
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,10 +118,11 @@ class MenuScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed:
-              () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              ),
+              // () => Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => HomeScreen()),
+              // ),
+              () => Navigator.pop(context),
         ),
       ),
       body: Column(
@@ -177,7 +179,7 @@ class MenuScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
+            child: SizedBox(
               height: 90, // Chiều cao của GridView
               child: GridView.count(
                 crossAxisCount: 2, // Hai cột trong GridView
@@ -241,7 +243,7 @@ class MenuScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: 40,
                               height: 40,
                               child: Center(
@@ -396,7 +398,7 @@ class MenuScreen extends StatelessWidget {
           ],
         ),
       );
-      items.forEach((item) {
+      for (var item in items) {
         menuWidgets.add(
           Card(
             shape: RoundedRectangleBorder(
@@ -435,7 +437,7 @@ class MenuScreen extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-                subtitle: Container(
+                subtitle: SizedBox(
                   width: 100,
                   child: Text(
                     item['type'],
@@ -454,8 +456,89 @@ class MenuScreen extends StatelessWidget {
             ),
           ),
         );
-      });
+      }
     });
     return menuWidgets;
   }
 }
+
+//test đặt bàn + món
+
+// import 'package:flutter/material.dart';
+
+// class MenuScreen extends StatefulWidget {
+//   const MenuScreen({super.key});
+
+//   @override
+//   _MenuScreenState createState() => _MenuScreenState();
+// }
+
+// class _MenuScreenState extends State<MenuScreen> {
+//   final List<Map<String, dynamic>> menuItems = [
+//     {"name": "Cafe Sữa", "price": 20000},
+//     {"name": "Trà Đào", "price": 25000},
+//     {"name": "Bánh Mì", "price": 15000},
+//   ];
+
+//   int total = 0;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final String tableName =
+//         ModalRoute.of(context)?.settings.arguments as String;
+
+//     return Scaffold(
+//       appBar: AppBar(title: Text("Thực đơn - $tableName")),
+//       body: Column(
+//         children: [
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: menuItems.length,
+//               itemBuilder: (context, index) {
+//                 return ListTile(
+//                   title: Text(menuItems[index]["name"]),
+//                   subtitle: Text("${menuItems[index]["price"]} đ"),
+//                   trailing: Icon(Icons.add),
+//                   onTap: () {
+//                     setState(() {
+//                       total += menuItems[index]["price"] as int;
+//                     });
+
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(
+//                         content: Text(
+//                           'Đã thêm ${menuItems[index]["name"]} - ${menuItems[index]["price"]}đ',
+//                         ),
+//                         duration: Duration(seconds: 1),
+//                       ),
+//                     );
+//                   },
+//                 );
+//               },
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(16.0),
+//             child: ElevatedButton.icon(
+//               onPressed:
+//                   total > 0
+//                       ? () {
+//                         Navigator.pushNamed(
+//                           context,
+//                           '/payment',
+//                           arguments: {"table": tableName, "total": total},
+//                         );
+//                       }
+//                       : null,
+//               icon: Icon(Icons.payment),
+//               label: Text("Thanh toán ($total đ)"),
+//               style: ElevatedButton.styleFrom(
+//                 minimumSize: Size(double.infinity, 50),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

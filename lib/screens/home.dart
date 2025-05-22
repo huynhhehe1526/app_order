@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dt02_nhom09/screens/menu.dart';
 import 'package:dt02_nhom09/class/gridItem_custom_class.dart';
+import './order_mode.dart';
 
 // class GirdItem {
 //   final String title;
@@ -18,8 +19,17 @@ import 'package:dt02_nhom09/class/gridItem_custom_class.dart';
 // }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  // const HomeScreen({super.key});
+  final String name;
+  final String role;
+  final int id;
 
+  const HomeScreen({
+    super.key,
+    required this.id,
+    required this.name,
+    required this.role,
+  });
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -59,10 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(builder: (context) => MenuScreen()),
       );
     } else if (index == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ProfileScreen()),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => ProfileScreen()),
+      // );
+      Navigator.pushNamed(context, '/profile', arguments: {'id': widget.id});
     }
   }
 
@@ -76,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
           size: 40,
           color: Colors.deepOrange,
         ),
+        onTap: () => {Navigator.pushNamed(context, '/tables')},
       ),
       GirdItem(
         title: 'Thực đơn',
@@ -91,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
       GirdItem(
         title: 'Thanh toán',
         icon: FaIcon(FontAwesomeIcons.creditCard, size: 40, color: Colors.blue),
+        onTap: () => {Navigator.pushNamed(context, '/payment')},
       ),
       GirdItem(
         title: 'Đơn hàng',
@@ -101,9 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         onTap:
             () => {
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(builder: (context) => OrderScreen()),
+                '/order',
+                arguments: {
+                  'role': widget.role,
+                  'id': widget.id,
+                  'fullname': widget.name,
+                },
               ),
             },
       ),
@@ -111,6 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'Quản lý nhân viên',
         icon: FaIcon(FontAwesomeIcons.users, size: 40, color: Colors.brown),
       ),
+      GirdItem(
+        title: 'Ca làm việc',
+        icon: FaIcon(FontAwesomeIcons.clock, size: 40, color: Colors.orange),
+        onTap: () {
+          // Thực hiện hành động khi nhấn vào "Ca làm việc"
+          // Ví dụ: mở màn hình cho chức năng ca làm việc
+        },
+      ),
+
       GirdItem(
         title: 'Thống kê doanh thu',
         icon: FaIcon(FontAwesomeIcons.chartBar, size: 40, color: Colors.teal),
@@ -149,8 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              accountName: Text('Đặng Như Huỳnh'),
-              accountEmail: Text('huynh@huit.edu.vn'),
+              // accountName: Text('Đặng Như Huỳnh'),
+              accountName: Text('${widget.name} (${widget.role})'),
+              accountEmail: Text('${widget.name}@huit.edu.vn'),
+
               currentAccountPicture: CircleAvatar(
                 backgroundImage: AssetImage('assets/images/logo_huit.png'),
               ),
@@ -159,10 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: Icon(Icons.store),
               title: Text('Cửa hàng'),
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => HomeScreen(name, role)),
+                // );
               },
             ),
             ListTile(
