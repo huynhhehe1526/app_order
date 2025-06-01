@@ -1,5 +1,9 @@
+import 'package:dt02_nhom09/class/Registrationshift.dart';
+import 'package:dt02_nhom09/class/area.dart';
 import 'package:dt02_nhom09/class/categories.dart';
 import 'package:dt02_nhom09/class/listFood.dart';
+import 'package:dt02_nhom09/class/shift.dart';
+import 'package:dt02_nhom09/class/table_model.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -46,7 +50,7 @@ class DatabaseHelper {
 
         // Bảng shift (ca làm việc)
         await db.execute('''
-          CREATE TABLE Shift(
+          CREATE TABLE Shifts(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             shiftname TEXT,
             start_time TEXT,
@@ -56,16 +60,25 @@ class DatabaseHelper {
           );
         ''');
 
+        //Bảng khu vực (area)
+        await db.execute('''
+          CREATE TABLE Areas(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT
+          )
+        ''');
+
         // Bảng table (bàn ăn)
         await db.execute('''
-          CREATE TABLE TableInfo(
+          CREATE TABLE Tables(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             seat_count INTEGER,
             status TEXT,
-            area_name TEXT,
             price REAL,
+            area_id INTEGER,
             created_at TEXT,
-            updated_at TEXT
+            updated_at TEXT,
+            FOREIGN KEY(area_id) REFERENCES Areas(id)
           );
         ''');
 
@@ -77,13 +90,16 @@ class DatabaseHelper {
             staff_id INTEGER,
             table_id INTEGER,
             created_at TEXT,
-            updated_at TEXT
+            updated_at TEXT,
+            FOREIGN KEY(shift_id) REFERENCES Shifts(id),
+            FOREIGN KEY(staff_id) REFERENCES users(id),
+            FOREIGN KEY(table_id) REFERENCES Tables(id) 
           );
         ''');
 
         // Bảng category
         await db.execute('''
-          CREATE TABLE Category(
+          CREATE TABLE Categories(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             created_at TEXT,
@@ -93,7 +109,7 @@ class DatabaseHelper {
 
         // Bảng dish (món ăn)
         await db.execute('''
-          CREATE TABLE Dish(
+          CREATE TABLE Dishes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             price REAL,
@@ -103,7 +119,8 @@ class DatabaseHelper {
             rating REAL,
             ratingCount INTEGER,
             created_at TEXT,
-            updated_at TEXT
+            updated_at TEXT,
+            FOREIGN KEY(category_id) REFERENCES Categories(id)
           );
         ''');
 
@@ -117,7 +134,9 @@ class DatabaseHelper {
             total_amount REAL,
             note TEXT,
             created_at TEXT,
-            updated_at TEXT
+            updated_at TEXT,
+            FOREIGN KEY(customer_id) REFERENCES users(id),
+            FOREIGN KEY(staff_id) REFERENCES users(id)
           );
         ''');
 
@@ -129,7 +148,10 @@ class DatabaseHelper {
             dish_id INTEGER,
             quantity INTEGER,
             status TEXT,
-            chef_id INTEGER
+            chef_id INTEGER,
+            FOREIGN KEY(order_id) REFERENCES Orders(id),
+            FOREIGN KEY(dish_id) REFERENCES Dishes(id),
+            FOREIGN KEY(chef_id) REFERENCES users(id)
           );
         ''');
 
@@ -183,24 +205,24 @@ class DatabaseHelper {
         });
 
         //categories dishes
-        await db.insert('Category', {
+        await db.insert('Categories', {
           'name': 'Món ăn chính',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-        await db.insert('Category', {
+        await db.insert('Categories', {
           'name': 'Đồ uống',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-        await db.insert('Category', {
+        await db.insert('Categories', {
           'name': 'Món tráng miệng',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
 
         //insert dishes
-        await db.insert('Dish', {
+        await db.insert('Dishes', {
           'name': 'Phở bò',
           'price': 50000,
           'image_url': 'assets/images/pho_bo.jpg',
@@ -211,7 +233,7 @@ class DatabaseHelper {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-        await db.insert('Dish', {
+        await db.insert('Dishes', {
           'name': 'Bánh Flan',
           'price': 25000,
           'image_url': 'assets/images/banh_flan.jpg',
@@ -222,7 +244,7 @@ class DatabaseHelper {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-        await db.insert('Dish', {
+        await db.insert('Dishes', {
           'name': 'Trà Đào',
           'price': 35000,
           'image_url': 'assets/images/tra_dao.jpg',
@@ -233,6 +255,74 @@ class DatabaseHelper {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
+
+        //areas
+        await db.insert('Areas', {'name': 'Ngoài trời'});
+
+        await db.insert('Areas', {'name': 'Trong nhà'});
+
+        await db.insert('Areas', {'name': 'Sự kiện'});
+
+        await db.insert('Areas', {'name': 'Phòng chờ'});
+
+        //shifts
+        await db.insert('Shifts', {
+          'shiftname': 'Ca sáng',
+          'start_time': '8h00',
+          'end_time': '13h00',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Shifts', {
+          'shiftname': 'Ca chiều',
+          'start_time': '13h00',
+          'end_time': '18h00',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Shifts', {
+          'shiftname': 'Ca tối',
+          'start_time': '18h30',
+          'end_time': '22h30',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        //Tables
+        await db.insert('Tables', {
+          'seat_count': 4,
+          'status': 'Trống',
+          'price': 150000,
+          'area_id': 1,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Tables', {
+          'seat_count': 2,
+          'status': 'Trống',
+          'price': 100000,
+          'area_id': 2,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Tables', {
+          'seat_count': 10,
+          'status': 'Trống',
+          'price': 300000,
+          'area_id': 3,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Tables', {
+          'seat_count': 10,
+          'status': 'Đang dùng',
+          'price': 200000,
+          'area_id': 4,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        //Staff enroll shift by area
       },
     );
   }
@@ -351,7 +441,7 @@ class DatabaseHelper {
   //category
   Future<List<Category>> getAllCategories() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('Category');
+    final List<Map<String, dynamic>> maps = await db.query('Categories');
     return List.generate(maps.length, (i) {
       return Category.fromMap(maps[i]);
     });
@@ -360,14 +450,14 @@ class DatabaseHelper {
   //dishes
   Future<List<Dish>> getAllDishes() async {
     final db = await database;
-    final maps = await db.query('Dish');
+    final maps = await db.query('Dishes');
     return List.generate(maps.length, (i) => Dish.fromMap(maps[i]));
   }
 
   Future<List<Dish>> getDishesByCategory(int categoryId) async {
     final db = await database;
     final maps = await db.query(
-      'Dish',
+      'Dishes',
       where: 'category_id = ?',
       whereArgs: [categoryId],
     );
@@ -378,9 +468,93 @@ class DatabaseHelper {
   Future<int> insertDish(Dish dish) async {
     final db = await database;
     return await db.insert(
-      'Dish',
-      dish.toMap(), 
+      'Dishes',
+      dish.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  //areas
+  Future<List<Area>> getAllAreas() async {
+    final db = await database;
+    final maps = await db.query('Areas');
+    return List.generate(maps.length, (i) => Area.fromMap(maps[i]));
+  }
+
+  //Filter table by area id
+  Future<List<TableModel>> getTablesByArea(int areaId) async {
+    final db = await database;
+    final maps = await db.query(
+      'Tables',
+      where: 'area_id = ?',
+      whereArgs: [areaId],
+    );
+    return List.generate(maps.length, (i) => TableModel.fromMap(maps[i]));
+  }
+
+  //get all shift
+  Future<List<Shift>> getAllShifts() async {
+    final db = await database;
+    final maps = await db.query('Shifts');
+    return List.generate(maps.length, (i) => Shift.fromMap(maps[i]));
+  }
+
+  //get all registation shift marked
+  Future<List<Registrationshift>> getAllRegistrationShift() async {
+    final db = await database;
+    final maps = await db.query('StaffShiftArea');
+    return List.generate(
+      maps.length,
+      (i) => Registrationshift.fromMap(maps[i]),
+    );
+  }
+
+  //show registration shift by id with role "staff both waiter and chef"
+  Future<List<Registrationshift>> getResgistShiftByStaffId(int staffId) async {
+    final db = await database;
+    final maps = await db.query(
+      'StaffShiftArea',
+      where: 'staff_id = ?',
+      whereArgs: [staffId],
+    );
+    return List.generate(
+      maps.length,
+      (i) => Registrationshift.fromMap(maps[i]),
+    );
+  }
+
+  Future<List<TableModel>> getTablesWithAreaNameByAreaId(
+    int areaId,
+  ) async {
+    final db = await database;
+    final  results = await db.rawQuery(
+      '''
+    SELECT Tables.id, Tables.seat_count, Tables.status, Tables.price,
+           Tables.area_id, Tables.created_at, Tables.updated_at,
+           Areas.name AS area_name
+    FROM Tables
+    INNER JOIN Areas ON Tables.area_id = Areas.id
+    WHERE Tables.area_id = ?
+  ''',
+      [areaId],
+    );
+
+    // return results;
+    return results.map((row) => TableModel.fromJoinedMap(row)).toList();
+  }
+
+  Future<String?> getAreaNameById(int areaId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'Areas',
+      where: 'id = ?',
+      whereArgs: [areaId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['name'];
+    } else {
+      return null;
+    }
   }
 }
