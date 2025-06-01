@@ -44,6 +44,8 @@ dependencies:
   intl: ^0.20.2
   path_provider: ^2.1.5
   sqflite: ^2.4.2
+  shared_preferences: ^2.2.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +97,9 @@ flutter:
     - assets/images/cheese_cake.jpg
     - assets/images/dienthoai-2-675x1200-26.jpg
     - assets/images/hinh-nen-may-tinh-4k-7.jpg
+    - assets/images/photo-1543007631-283050bb3e8c.jpg
+    - assets/images/background-mau-hong-nhat-cho-powerpoint_012158014.jpg
+    - assets/images/Why-is-Good-Lighting-Important-in-a-Restaurant-scaled.webp
     # logo
     - assets/logo/logo_acb.png
     - assets/logo/logo_mbbank.png
@@ -104,6 +109,12 @@ flutter:
     - assets/logo/logo_argibank.webp
     - assets/logo/logo_vettinbank.webp
     - assets/logo/logo_techcombank.jpg
+
+    #loại món ăn
+    - assets/images/loaiThucAn/bg_monanchinh.png
+    - assets/images/loaiThucAn/bg_douong.jpg
+    - assets/images/loaiThucAn/bg_montrangmieng.jpg
+    - assets/images/loaiThucAn/360_F_574595275_AuuGUzG52xppbhcbNVxt4kiHe0wbQE6C.jpg
 
   #   - images/a_dot_ham.jpeg
 

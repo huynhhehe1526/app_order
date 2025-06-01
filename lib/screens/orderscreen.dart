@@ -12,7 +12,7 @@ class OrderScreen extends StatefulWidget {
     super.key,
     required this.role,
     required this.id,
-    required this.name, 
+    required this.name,
   });
   @override
   _OrderScreenState createState() => _OrderScreenState();
@@ -73,7 +73,7 @@ class _OrderScreenState extends State<OrderScreen> {
     } else if (widget.role == "Nhân viên phục vụ") {
       // Phục vụ xem order mà staff_id là userId
       filteredOrders = orders.where((o) => o['staff_id'] == widget.id);
-    } else if (widget.role == "Khách hàng") {
+    } else if (widget.role == "Khách") {
       // Khách hàng xem order mà customer_id là userId
       filteredOrders = orders.where((o) => o['customer_id'] == widget.id);
     } else {
@@ -117,7 +117,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if ((widget.role == "Khách hàng" || widget.role == "Phục vụ") &&
+    if ((widget.role == "Khách" || widget.role == "Phục vụ") &&
         displayOrders.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text("Danh sách đơn hàng")),
@@ -126,6 +126,55 @@ class _OrderScreenState extends State<OrderScreen> {
             "Chưa có đơn nào",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            // Xác định mode theo role
+
+            OrderMode mode;
+            if (widget.role == "Khách") {
+              mode = OrderMode.customerOnline;
+            } else {
+              mode = OrderMode.staffWalkIn;
+            }
+
+            // final newOrder = await Navigator.pushNamed(
+            //   context,
+            //   '/add_order',
+            //   arguments: {'mode': mode},
+            // );
+            final newOrder = await Navigator.pushNamed(
+              context,
+              '/add_order',
+              arguments: {
+                'mode':
+                    widget.role == 'Khách'
+                        ? OrderMode.customerOnline
+                        : OrderMode.staffWalkIn,
+                'name': widget.name,
+                'role': widget.role,
+              },
+            );
+
+            if (newOrder != null && newOrder is Map<String, dynamic>) {
+              setState(() {
+                final newId =
+                    displayOrders.isNotEmpty
+                        ? (displayOrders.last['id'] as int) + 1
+                        : 1;
+                newOrder['id'] = newId;
+
+                if (newOrder['details'] == null ||
+                    newOrder['details'] is! List) {
+                  newOrder['details'] = [];
+                }
+
+                displayOrders.add(newOrder);
+              });
+            }
+          },
+          tooltip: "Thêm đơn hàng",
+          child: const Icon(Icons.add),
         ),
       );
     }
@@ -241,8 +290,9 @@ class _OrderScreenState extends State<OrderScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // Xác định mode theo role
+
           OrderMode mode;
-          if (widget.role == 'Khách hàng') {
+          if (widget.role == "Khách") {
             mode = OrderMode.customerOnline;
           } else {
             mode = OrderMode.staffWalkIn;
@@ -258,7 +308,7 @@ class _OrderScreenState extends State<OrderScreen> {
             '/add_order',
             arguments: {
               'mode':
-                  widget.role == 'Khách hàng'
+                  widget.role == 'Khách'
                       ? OrderMode.customerOnline
                       : OrderMode.staffWalkIn,
               'name': widget.name,

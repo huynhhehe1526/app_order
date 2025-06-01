@@ -1,4 +1,5 @@
 import 'package:dt02_nhom09/screens/login_screen.dart';
+import 'package:dt02_nhom09/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.pushReplacement(
         context,
         // MaterialPageRoute(builder: (context) => HomeScreen()),
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
       );
     });
   }
@@ -49,17 +50,26 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        // decoration: BoxDecoration(
+        //   gradient: LinearGradient(
+        //     colors: [
+        //       Color.fromARGB(255, 26, 188, 224),
+        //       Color.fromARGB(255, 164, 23, 234),
+        //       Color.fromARGB(255, 235, 53, 150),
+        //     ],
+        //     begin: Alignment.centerLeft,
+        //     end: Alignment.bottomRight,
+        //   ),
+        // ),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 26, 188, 224),
-              Color.fromARGB(255, 164, 23, 234),
-              Color.fromARGB(255, 235, 53, 150),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.bottomRight,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/images/Why-is-Good-Lighting-Important-in-a-Restaurant-scaled.webp',
+            ),
+            fit: BoxFit.cover,
           ),
         ),
+
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

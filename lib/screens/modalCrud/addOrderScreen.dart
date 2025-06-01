@@ -816,7 +816,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   /* ------------------------------------------------------------------ */
   @override
   Widget build(BuildContext context) {
-    final isCustomer = widget.role == 'Khách hàng';
+    final isCustomer = widget.role == "Khách";
     final isManage = widget.role == 'Quản lý';
 
     return Scaffold(
@@ -1007,9 +1007,9 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   //   Navigator.pop(context, orderMap);
   // }
   bool get _canSubmit {
-  // logic kiểm tra
-  return selectedTableId != null && _selectedDishes.values.any((q) => q > 0);
-}
+    // logic kiểm tra
+    return selectedTableId != null && _selectedDishes.values.any((q) => q > 0);
+  }
   // bool get _canSubmit {
   //   if (!_canSubmit) return false;
   //   // Nếu là nhân viên phục vụ, cần nhập họ tên & số điện thoại

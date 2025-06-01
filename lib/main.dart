@@ -3,6 +3,7 @@ import 'package:dt02_nhom09/screens/chef_screen.dart';
 import 'package:dt02_nhom09/screens/home.dart';
 import 'package:dt02_nhom09/screens/login_screen.dart';
 import 'package:dt02_nhom09/screens/menu.dart';
+import 'package:dt02_nhom09/screens/modalCrud/addMenu.dart';
 import 'package:dt02_nhom09/screens/modalCrud/addOrderScreen.dart';
 import 'package:dt02_nhom09/screens/order_detail_screen.dart';
 import 'package:dt02_nhom09/screens/orderscreen.dart';
@@ -14,12 +15,12 @@ import 'package:dt02_nhom09/screens/table_screen.dart';
 import 'package:dt02_nhom09/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dt02_nhom09/screens/order_mode.dart';
-// import 'package:dt02_nhom09/screens/home.dart';
+import 'package:dt02_nhom09/db/db_helper.dart';
+import 'package:dt02_nhom09/screens/employee_management.dart';
 
-// void main() {
-//   runApp(MaterialApp(home: SplashScreen(), debugShowCheckedModeBanner: false));
-// }
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper().insertDefaultManager();
   runApp(MyApp());
 }
 
@@ -33,11 +34,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        // '/': (context) => SplashScreen(),
-        '/': (context) => WelcomeScreen(),
+        '/': (context) => SplashScreen(),
+        // '/': (context) => WelcomeScreen(),
         '/login': (context) => SigninScreen(),
         '/tables': (context) => TableScreen(),
         '/menu': (context) => MenuScreen(),
+        '/add_menu': (context) => AddMenuScreen(),
         // '/chef':(context) => ChefScreen(chefId: chefId)
         // '/order': (context) => OrderScreen(),
         // '/payment': (context) => PaymentScreen(),
@@ -77,7 +79,15 @@ class MyApp extends StatelessWidget {
         //     builder: (_) => AddOrderScreen(mode: mode, name: name, role: role),
         //   );
         // }
-        else if (settings.name == '/add_order') {
+        else if (settings.name == '/manage') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder:
+                (_) => EmployeeManagementScreen(
+                  currentUserRole: args['currentUserRole'],
+                ),
+          );
+        } else if (settings.name == '/add_order') {
           final args = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
             builder:
@@ -92,9 +102,6 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder:
                 (_) => OrderScreen(
-                  // id: int.parse(args['id']!),
-                  // name: args['fullname']!,
-                  // role: args['role']!,
                   role: args['role'] as String,
                   id: args['id'] as int,
                   name: args['fullname'] as String,
