@@ -9,6 +9,8 @@ import 'package:dt02_nhom09/screens/order_detail_screen.dart';
 import 'package:dt02_nhom09/screens/orderscreen.dart';
 import 'package:dt02_nhom09/screens/payment_screen.dart';
 import 'package:dt02_nhom09/screens/profile_screen.dart';
+import 'package:dt02_nhom09/screens/selectShiftRoleScreen.dart';
+import 'package:dt02_nhom09/screens/shiftListScreen.dart';
 import 'package:dt02_nhom09/screens/sign_in.dart';
 import 'package:dt02_nhom09/screens/slashscreen.dart';
 import 'package:dt02_nhom09/screens/table_screen.dart';
@@ -17,10 +19,12 @@ import 'package:flutter/material.dart';
 import 'package:dt02_nhom09/screens/order_mode.dart';
 import 'package:dt02_nhom09/db/db_helper.dart';
 import 'package:dt02_nhom09/screens/employee_management.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseHelper().insertDefaultManager();
+
   runApp(MyApp());
 }
 
@@ -40,6 +44,8 @@ class MyApp extends StatelessWidget {
         '/tables': (context) => TableScreen(),
         '/menu': (context) => MenuScreen(),
         '/add_menu': (context) => AddMenuScreen(),
+        '/shift-role-select': (_) => const SelectShiftRoleScreen(),
+        // '/shift-list': (_) => const ShiftListScreen(), // nhận arguments
         // '/chef':(context) => ChefScreen(chefId: chefId)
         // '/order': (context) => OrderScreen(),
         // '/payment': (context) => PaymentScreen(),
@@ -113,6 +119,11 @@ class MyApp extends StatelessWidget {
         } else if (settings.name == '/chef') {
           final id = settings.arguments as int;
           return MaterialPageRoute(builder: (_) => ChefScreen(chefId: id));
+        } else if (settings.name == '/shift-list') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => ShiftListScreen(userId: args['userId']),
+          );
         }
         return null;
       },

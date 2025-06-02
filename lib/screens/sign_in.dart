@@ -1,4 +1,4 @@
-// //test giao diện
+//test
 // import 'package:dt02_nhom09/screens/custom_welcome.dart';
 // import 'package:flutter/material.dart';
 // import 'package:dt02_nhom09/screens/home.dart';
@@ -6,6 +6,7 @@
 // import 'package:dt02_nhom09/class/user.dart';
 // import 'package:dt02_nhom09/db/db_helper.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:dt02_nhom09/screens/employee_management.dart';
 
 // class SigninScreen extends StatefulWidget {
 //   const SigninScreen({super.key});
@@ -16,13 +17,13 @@
 
 // class _SigninScreenState extends State<SigninScreen> {
 //   final _formKey = GlobalKey<FormState>();
-
 //   final _emailController = TextEditingController();
 //   final _passwordController = TextEditingController();
-
 //   final DatabaseHelper dbHelper = DatabaseHelper();
 
 //   bool rememberPass = true;
+//   bool _obscurePassword =
+//       true; // Thêm biến theo dõi trạng thái ẩn/hiện mật khẩu
 
 //   @override
 //   void dispose() {
@@ -74,7 +75,7 @@
 //       ),
 //     );
 
-//     // Chuyển sang màn hình Home
+//     // Chuyển sang màn hình phù hợp với vai trò
 //     Navigator.pushReplacement(
 //       context,
 //       MaterialPageRoute(
@@ -85,6 +86,65 @@
 //               role: user.role,
 //             ),
 //       ),
+//     );
+//   }
+
+//   void _showForgotPasswordDialog() {
+//     final emailController = TextEditingController();
+
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext dialogContext) {
+//         return AlertDialog(
+//           title: const Text('Quên mật khẩu'),
+//           content: TextField(
+//             controller: emailController,
+//             decoration: const InputDecoration(labelText: 'Nhập email của bạn'),
+//           ),
+//           actions: [
+//             TextButton(
+//               child: const Text('Hủy'),
+//               onPressed: () => Navigator.of(dialogContext).pop(),
+//             ),
+//             TextButton(
+//               child: const Text('Gửi'),
+//               onPressed: () async {
+//                 String email = emailController.text.trim();
+//                 if (email.isEmpty) return;
+
+//                 User? user = await dbHelper.getUserByEmail(email);
+//                 Navigator.of(context).pop();
+
+//                 if (user == null) {
+//                   ScaffoldMessenger.of(context).showSnackBar(
+//                     const SnackBar(
+//                       content: Text('Email không tồn tại trong hệ thống'),
+//                       backgroundColor: Colors.red,
+//                     ),
+//                   );
+//                 } else {
+//                   // Tạm thời hiện mật khẩu ra vì không có gửi email
+//                   showDialog(
+//                     context: context,
+//                     builder:
+//                         (BuildContext dialogContext) => AlertDialog(
+//                           title: const Text("Mật khẩu của bạn là:"),
+//                           content: Text(user.password),
+//                           actions: [
+//                             TextButton(
+//                               child: const Text("Đóng"),
+//                               onPressed:
+//                                   () => Navigator.of(dialogContext).pop(),
+//                             ),
+//                           ],
+//                         ),
+//                   );
+//                 }
+//               },
+//             ),
+//           ],
+//         );
+//       },
 //     );
 //   }
 
@@ -103,9 +163,6 @@
 //                   begin: Alignment.centerRight,
 //                   end: Alignment.centerLeft,
 //                   colors: [
-//                     // Colors.white.withOpacity(0.0),
-//                     // Colors.white.withOpacity(0.7),
-//                     // Colors.white,
 //                     Colors.black.withOpacity(0.0),
 //                     Colors.black.withOpacity(0.7),
 //                     Colors.black,
@@ -119,16 +176,17 @@
 //                   mainAxisSize: MainAxisSize.min,
 //                   children: [
 //                     const Text(
-//                       'Đăng nhập',
+//                       'Sign In',
 //                       style: TextStyle(
 //                         fontSize: 26,
 //                         fontWeight: FontWeight.bold,
-//                         color: Color.fromARGB(255, 173, 129, 17),
+//                         color: Colors.amber,
 //                       ),
 //                     ),
 //                     const SizedBox(height: 30),
 //                     TextFormField(
 //                       controller: _emailController,
+//                       style: const TextStyle(color: Colors.white),
 //                       validator: (value) {
 //                         if (value == null || value.isEmpty) {
 //                           return "Vui lòng nhập email";
@@ -142,8 +200,11 @@
 //                       },
 //                       decoration: InputDecoration(
 //                         labelText: 'Email',
+//                         labelStyle: const TextStyle(
+//                           color: Color.fromARGB(255, 173, 129, 17),
+//                         ),
 //                         hintText: 'Nhập email',
-//                         hintStyle: const TextStyle(color: Colors.white),
+//                         // hintStyle: const TextStyle(color: Colors.white),
 //                         border: OutlineInputBorder(
 //                           borderSide: const BorderSide(color: Colors.black),
 //                           borderRadius: BorderRadius.circular(10),
@@ -157,7 +218,8 @@
 //                     const SizedBox(height: 30),
 //                     TextFormField(
 //                       controller: _passwordController,
-//                       obscureText: true,
+//                       style: const TextStyle(color: Colors.white),
+//                       obscureText: _obscurePassword,
 //                       obscuringCharacter: '*',
 //                       validator: (value) {
 //                         if (value == null || value.isEmpty) {
@@ -167,8 +229,12 @@
 //                       },
 //                       decoration: InputDecoration(
 //                         labelText: 'Password',
+//                         // labelStyle: const TextStyle(color: Colors.white),
+//                         labelStyle: const TextStyle(
+//                           color: Color.fromARGB(255, 173, 129, 17),
+//                         ),
 //                         hintText: 'Nhập mật khẩu',
-//                         hintStyle: const TextStyle(color: Colors.white),
+//                         // hintStyle: const TextStyle(color: Colors.white),
 //                         border: OutlineInputBorder(
 //                           borderRadius: BorderRadius.circular(10),
 //                           borderSide: const BorderSide(color: Colors.black),
@@ -177,24 +243,52 @@
 //                           borderSide: const BorderSide(color: Colors.black),
 //                           borderRadius: BorderRadius.circular(10),
 //                         ),
-//                       ),
-//                     ),
-//                     const SizedBox(height: 30),
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.start,
-//                       children: [
-//                         Checkbox(
-//                           value: rememberPass,
-//                           onChanged: (bool? value) {
+//                         suffixIcon: IconButton(
+//                           icon: Icon(
+//                             _obscurePassword
+//                                 ? Icons.visibility_off
+//                                 : Icons.visibility,
+//                             color: Color(0xFFAD8111),
+//                           ),
+//                           onPressed: () {
 //                             setState(() {
-//                               rememberPass = value ?? false;
+//                               _obscurePassword = !_obscurePassword;
 //                             });
 //                           },
-//                           activeColor: const Color(0xFF416FDF),
 //                         ),
-//                         const Text(
-//                           'Remember me',
-//                           style: TextStyle(color: Colors.white),
+//                       ),
+//                     ),
+//                     const SizedBox(height: 10),
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Row(
+//                           children: [
+//                             Checkbox(
+//                               value: rememberPass,
+//                               onChanged: (bool? value) {
+//                                 setState(() {
+//                                   rememberPass = value ?? false;
+//                                 });
+//                               },
+//                               activeColor: const Color(0xFF416FDF),
+//                             ),
+//                             const Text(
+//                               'Remember me',
+//                               style: TextStyle(color: Colors.white),
+//                             ),
+//                           ],
+//                         ),
+//                         GestureDetector(
+//                           onTap: _showForgotPasswordDialog,
+//                           child: const Text(
+//                             'Quên mật khẩu?',
+//                             style: TextStyle(
+//                               color: Color.fromARGB(255, 173, 129, 17),
+//                               fontWeight: FontWeight.bold,
+//                               decoration: TextDecoration.underline,
+//                             ),
+//                           ),
 //                         ),
 //                       ],
 //                     ),
@@ -202,8 +296,7 @@
 //                     ElevatedButton(
 //                       onPressed: _handleSignin,
 //                       style: ElevatedButton.styleFrom(
-//                         // backgroundColor: Colors.blue,
-//                         backgroundColor: Color.fromARGB(255, 182, 124, 7),
+//                         backgroundColor: Color.fromARGB(255, 173, 129, 17),
 //                         padding: const EdgeInsets.symmetric(
 //                           horizontal: 40,
 //                           vertical: 15,
@@ -227,9 +320,28 @@
 //                           ),
 //                         );
 //                       },
-//                       child: const Text(
-//                         'Bạn chưa có tài khoản? Đăng ký',
-//                         style: TextStyle(color: Colors.white),
+//                       // child: const Text(
+//                       //   'Bạn chưa có tài khoản? Đăng ký',
+//                       //   style: TextStyle(color: Colors.white),
+//                       // ),
+//                       child: Text.rich(
+//                         TextSpan(
+//                           text: 'Bạn chưa có tài khoản? ',
+//                           style: TextStyle(
+//                             color: Colors.white,
+//                           ), // Màu chữ chung
+//                           children: [
+//                             TextSpan(
+//                               text: 'Đăng ký',
+//                               style: TextStyle(
+//                                 color:
+//                                     Colors
+//                                         .blue, // 🎯 Màu xanh riêng cho chữ "Đăng ký"
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
 //                       ),
 //                     ),
 //                   ],
@@ -243,7 +355,7 @@
 //   }
 // }
 
-//test
+//test cuối
 import 'package:dt02_nhom09/screens/custom_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:dt02_nhom09/screens/home.dart';
@@ -251,7 +363,6 @@ import 'package:dt02_nhom09/screens/sign_up.dart';
 import 'package:dt02_nhom09/class/user.dart';
 import 'package:dt02_nhom09/db/db_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dt02_nhom09/screens/employee_management.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -269,6 +380,27 @@ class _SigninScreenState extends State<SigninScreen> {
   bool rememberPass = true;
   bool _obscurePassword =
       true; // Thêm biến theo dõi trạng thái ẩn/hiện mật khẩu
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedCredentials();
+  }
+
+  void _loadRememberedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString('remembered_email');
+    String? savedPassword = prefs.getString('remembered_password');
+
+    if (savedEmail != null && savedPassword != null) {
+      setState(() {
+        _emailController.text = savedEmail;
+        _passwordController.text = savedPassword;
+        rememberPass = true;
+      });
+      // _handleSignin();
+    }
+  }
 
   @override
   void dispose() {
@@ -311,6 +443,14 @@ class _SigninScreenState extends State<SigninScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', user.id ?? 0);
     await prefs.setString('user_role', user.role);
+
+    if (rememberPass) {
+      await prefs.setString('remembered_email', email);
+      await prefs.setString('remembered_password', password);
+    } else {
+      await prefs.remove('remembered_email');
+      await prefs.remove('remembered_password');
+    }
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

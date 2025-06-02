@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:dt02_nhom09/class/user.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -27,7 +28,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'restaurant_app.db');
 
     print('Opening database at $path'); // Debug thêm
-
+    await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -130,6 +131,7 @@ class DatabaseHelper {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             customer_id INTEGER,
             staff_id INTEGER,
+            table_id INTEGER,
             status TEXT,
             total_amount REAL,
             note TEXT,
@@ -149,6 +151,8 @@ class DatabaseHelper {
             quantity INTEGER,
             status TEXT,
             chef_id INTEGER,
+            created_at TEXT,
+            updated_at TEXT,
             FOREIGN KEY(order_id) REFERENCES Orders(id),
             FOREIGN KEY(dish_id) REFERENCES Dishes(id),
             FOREIGN KEY(chef_id) REFERENCES users(id)
@@ -200,6 +204,43 @@ class DatabaseHelper {
           'phone': '0112657934',
           'email': 'nv2@gmail.com',
           'address': 'Quận Tân Phú',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        //Khách
+        await db.insert('users', {
+          'username': 'tuan',
+          'password': '12345',
+          'fullname': 'Nguyễn Văn Tuấn',
+          'role': 'Khách',
+          'phone': '0112657934',
+          'email': 'tuan@gmail.com',
+          'address': 'Quận 5',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        //Bếp
+        await db.insert('users', {
+          'username': 'vu',
+          'password': '12345',
+          'fullname': 'Nguyễn Tuấn Vũ',
+          'role': 'Bếp',
+          'phone': '0112657934',
+          'email': 'vu@gmail.com',
+          'address': 'Quận 5',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        await db.insert('users', {
+          'username': 'khanh',
+          'password': '12345',
+          'fullname': 'Nguyễn Phương Khánh',
+          'role': 'Bếp',
+          'phone': '0112657934',
+          'email': 'khanh@gmail.com',
+          'address': 'Quận 5',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
@@ -323,6 +364,68 @@ class DatabaseHelper {
         });
 
         //Staff enroll shift by area
+        await db.insert('StaffShiftArea', {
+          'shift_id': 1, // Ca sáng
+          'staff_id': 3, // nv1
+          'table_id': 1,
+          'created_at': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('StaffShiftArea', {
+          'shift_id': 1, // Ca sáng
+          'staff_id': 3, // nv1
+          'table_id': 2,
+          'created_at': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('StaffShiftArea', {
+          'shift_id': 2, // Ca sáng
+          'staff_id': 3, // nv1
+          'table_id': 3,
+          'created_at': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('StaffShiftArea', {
+          'shift_id': 3, // Ca sáng
+          'staff_id': 3, // nv1
+          'table_id': 3,
+          'created_at': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        // Thêm dữ liệu mẫu cho bảng Orders
+        await db.insert('Orders', {
+          'customer_id': 5, // Ví dụ khách hàng có ID là 5
+          'staff_id': 3, // Nhân viên xử lý đơn hàng có ID là 3
+          'table_id': 1,
+          'status': 'Đang xử lý',
+          'total_amount': 150000, // Tổng số tiền đơn hàng
+          'note': 'Đặt món ăn cho bàn số 1',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        // Thêm dữ liệu mẫu cho bảng OrderDetail
+        await db.insert('OrderDetail', {
+          'order_id': 1, // Ví dụ đơn hàng có ID là 1
+          'dish_id': 1, // Món ăn có ID là 1 (ví dụ: Phở bò)
+          'quantity': 2, // Số lượng món ăn trong đơn hàng
+          'status': 'Đang chế biến',
+          'chef_id': 6,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        // Thêm dữ liệu mẫu cho bảng OrderDetail khác
+        await db.insert('OrderDetail', {
+          'order_id': 1,
+          'dish_id': 3,
+          'quantity': 1,
+          'status': 'Chờ chế biến',
+          'chef_id': 7,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
       },
     );
   }
@@ -523,11 +626,9 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<TableModel>> getTablesWithAreaNameByAreaId(
-    int areaId,
-  ) async {
+  Future<List<TableModel>> getTablesWithAreaNameByAreaId(int areaId) async {
     final db = await database;
-    final  results = await db.rawQuery(
+    final results = await db.rawQuery(
       '''
     SELECT Tables.id, Tables.seat_count, Tables.status, Tables.price,
            Tables.area_id, Tables.created_at, Tables.updated_at,
@@ -556,5 +657,218 @@ class DatabaseHelper {
     } else {
       return null;
     }
+  }
+
+  /// Ca của HÔM NAY theo role ('Phục vụ' | 'Bếp') – dành cho Quản lý
+  // Future<List<Map<String, dynamic>>> getTodayShiftsByRole(String role) async {
+  //   final db = await database;
+  //   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  //   final rows = await db.rawQuery(
+  //     '''
+  //   SELECT ssa.id             AS id,
+  //          ssa.table_id,
+  //          ssa.shift_id,
+  //          u.fullname         AS staffName,
+  //          u.id               AS staff_id,
+  //          sh.shiftname,
+  //          sh.start_time,
+  //          sh.end_time
+  //   FROM   StaffShiftArea ssa
+  //   JOIN   users u      ON u.id      = ssa.staff_id
+  //   JOIN   Shifts sh    ON sh.id     = ssa.shift_id
+  //   WHERE  date(ssa.created_at) = ?      -- NGÀY làm việc
+  //      AND u.role              = ?
+  //   ORDER  BY sh.start_time
+  // ''',
+  //     [today, role],
+  //   );
+
+  //   return rows;
+  // }
+
+  //test
+  Future<List<Map<String, dynamic>>> getTodayShiftsByRole(String role) async {
+    final db = await database;
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final rows = await db.rawQuery(
+      '''
+    SELECT ssa.id                 AS id,
+           ssa.table_id,
+           a.name                 AS areaName,
+           ssa.shift_id,
+           u.fullname             AS staffName,
+           u.id                   AS staff_id,
+           sh.shiftname,
+           sh.start_time,
+           sh.end_time
+    FROM   StaffShiftArea ssa
+    JOIN   users u      ON u.id      = ssa.staff_id
+    JOIN   Shifts sh    ON sh.id     = ssa.shift_id
+    JOIN   Tables t     ON t.id      = ssa.table_id
+    JOIN   Areas a      ON a.id      = t.area_id
+    WHERE  date(ssa.created_at) = ?      -- NGÀY làm việc
+       AND u.role              = ?
+    ORDER  BY sh.start_time
+    ''',
+      [today, role],
+    );
+
+    return rows;
+  }
+
+  /// Ca của HÔM NAY theo staffId – dành cho Phục vụ/Bếp
+  Future<List<Map<String, dynamic>>> getTodayShiftsByStaff(int staffId) async {
+    final db = await database;
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final rows = await db.rawQuery(
+      '''
+    SELECT ssa.id             AS id,
+           ssa.table_id,
+           a.name                 AS areaName,
+           ssa.shift_id,
+           sh.shiftname,
+           sh.start_time,
+           sh.end_time
+    FROM   StaffShiftArea ssa
+    JOIN   Shifts sh ON sh.id = ssa.shift_id
+    JOIN   Tables t     ON t.id      = ssa.table_id
+    JOIN   Areas a      ON a.id      = t.area_id
+    WHERE  date(ssa.created_at) = ?
+       AND ssa.staff_id         = ?
+    ORDER  BY sh.start_time
+  ''',
+      [today, staffId],
+    );
+
+    return rows;
+  }
+
+  Future<int> insertStaffShiftArea(Registrationshift resg) async {
+    final db = await database;
+
+    return await db.insert(
+      'StaffShiftArea',
+      resg.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Area>> getAreasInTodayShiftByStaff(int staffId) async {
+    final db = await database;
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // 1. Tìm ra shift hiện tại
+    final now = DateFormat('HH:mm').format(DateTime.now()); // "15:42"
+    final shift = await db.rawQuery(
+      '''
+      SELECT id
+      FROM   Shifts
+      WHERE  time(?) BETWEEN start_time AND end_time
+      LIMIT  1
+  ''',
+      [now],
+    );
+
+    if (shift.isEmpty) return []; // Không có ca nào phù hợp
+
+    final shiftId = shift.first['id'] as int;
+
+    // 2. Lấy DISTINCT khu vực của nhân viên trong ca đó
+    final rows = await db.rawQuery(
+      '''
+    SELECT DISTINCT a.id, a.name
+    FROM   StaffShiftArea ssa
+    JOIN   Tables t ON t.id   = ssa.table_id
+    JOIN   Areas  a ON a.id   = t.area_id
+    JOIN   Shifts sh  a ON sh.id   = ssa.shift_id
+    WHERE  ssa.staff_id       = ?
+      AND  ssa.shift_id       = ?
+      AND  time(?) BETWEEN sh.start_time AND sh.end_time
+  ''',
+      [staffId, shiftId, today],
+    );
+
+    return rows.map((m) => Area.fromMap(m)).toList();
+  }
+
+  /// Trả về danh sách bàn (kèm tên khu vực) mà nhân viên `staffId`
+  /// phụ trách **trong ca hiện tại** của HÔM NAY.
+  // Future<List<TableModel>> getTablesInCurrentShiftByStaff(int staffId) async {
+  //   final db = await database;
+  //   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  //   final now = DateFormat('HH:mm').format(DateTime.now()); // vd "12:05"
+
+  //   final rows = await db.rawQuery(
+  //     '''
+  //   SELECT t.id, t.seat_count, t.status, t.price,
+  //          t.area_id, t.created_at, t.updated_at,
+  //          a.name AS area_name
+  //   FROM   StaffShiftArea ssa
+  //   JOIN   Shifts  sh ON sh.id = ssa.shift_id
+  //   JOIN   Tables  t  ON t.id  = ssa.table_id
+  //   JOIN   Areas   a  ON a.id  = t.area_id
+  //   WHERE  ssa.staff_id = ?
+  //     AND  date(ssa.created_at) = ?                -- cùng NGÀY đăng ký
+  //     AND  time(?) BETWEEN sh.start_time AND sh.end_time
+  //   ''',
+  //     [staffId, today, now],
+  //   );
+
+  //   return rows.map((m) => TableModel.fromJoinedMap(m)).toList();
+  // }
+  Future<List<Map<String, dynamic>>> getOrderWithUserInfo() async {
+    final db = await database;
+
+    final result = await db.rawQuery('''
+    SELECT 
+      o.id,
+      o.customer_id,
+      cu.fullname AS customerName,
+      o.staff_id,
+      st.fullname AS staffName,
+      o.table_id,
+      ar.name AS areaName,
+      o.status,
+      o.total_amount,
+      o.note
+    FROM Orders o
+    LEFT JOIN users cu ON o.customer_id = cu.id
+    LEFT JOIN users st ON o.staff_id = st.id
+    JOIN Tables t ON t.id = o.table_id
+    JOIN Areas ar ON ar.id = t.area_id
+
+  ''');
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> getOrderDetailsByOrderId(
+    int orderId,
+  ) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      '''
+    SELECT 
+      od.order_id, 
+      od.dish_id, 
+      d.name AS dish_name, 
+      od.quantity, 
+      od.status, 
+      od.chef_id, 
+      u.fullName AS chef_name
+    FROM OrderDetail od
+    JOIN Orders o ON od.order_id = o.id
+    JOIN Dishes d ON od.dish_id = d.id
+    JOIN users u ON od.chef_id = u.id
+    WHERE od.order_id = ?
+  ''',
+      [orderId],
+    );
+
+    return result;
   }
 }

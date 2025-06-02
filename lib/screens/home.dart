@@ -169,8 +169,20 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.orange,
         ),
         // onTap: () => Navigator.pushNamed(ctx, '/shifts'),
-        onTap:
-            () => Navigator.pushNamed(context, '/chef', arguments: widget.id),
+        // onTap:
+        //     () => Navigator.pushNamed(context, '/chef', arguments: widget.id),
+        onTap: () {
+          final role = widget.role.trim().toLowerCase();
+          if (role == 'quản lý') {
+            Navigator.pushNamed(context, '/shift-role-select');
+          } else {
+            Navigator.pushNamed(
+              context,
+              '/shift-list',
+              arguments: {'userId': widget.id},
+            );
+          }
+        },
       ),
       'Thống kê doanh thu': GirdItem(
         title: 'Thống kê doanh thu',
@@ -211,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'quản lý':
         allowedKeys = allItems.keys.toList(); // tất cả
         break;
-      case 'nhân viên phục vụ':
+      case 'nhân viên':
       case 'bếp':
         allowedKeys = [
           'Đặt bàn',
