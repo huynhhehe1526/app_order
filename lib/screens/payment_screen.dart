@@ -94,7 +94,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final amount = widget.order['total'];
+    // final amount = widget.order['total'];
+    // final num amount = widget.order['total'] as num;
+    final double amount =
+        widget.order['total'] is int
+            ? (widget.order['total'] as int).toDouble()
+            : widget.order['total'] as double;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Thanh toán chuyển khoản')),
@@ -150,7 +155,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   /* ------------------------------------------------------------------ */
   /*                           QR SECTION                               */
   /* ------------------------------------------------------------------ */
-  Widget _buildQR(int amount) => Column(
+  Widget _buildQR(double amount) => Column(
     children: [
       const Text(
         'Quét mã QR bên dưới để thanh toán:',
@@ -179,7 +184,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   /* ------------------------------------------------------------------ */
   /*                        ACCOUNT SECTION                             */
   /* ------------------------------------------------------------------ */
-  Widget _buildAccount(int amount) => Column(
+  Widget _buildAccount(double amount) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const Text('Chọn ngân hàng', style: TextStyle(fontSize: 16)),

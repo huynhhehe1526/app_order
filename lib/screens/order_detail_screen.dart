@@ -163,8 +163,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
             ),
             Divider(),
+            // Text(
+            //   "💵 Tổng cộng: ${order['total']}đ",
+            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            // ),
             Text(
-              "💵 Tổng cộng: ${order['total']}đ",
+              "💵 Tổng cộng: ${(order['total'] as num).toDouble().toStringAsFixed(2)}đ",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
