@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
         // '/': (context) => WelcomeScreen(),
         '/login': (context) => SigninScreen(),
         '/tables': (context) => TableScreen(),
-        '/menu': (context) => MenuScreen(),
-        '/add_menu': (context) => AddMenuScreen(),
+        // '/menu': (context) => MenuScreen(),
+        // '/add_menu': (context) => AddMenuScreen(),
         '/shift-role-select': (_) => const SelectShiftRoleScreen(),
         // '/shift-list': (_) => const ShiftListScreen(), // nhận arguments
         // '/chef':(context) => ChefScreen(chefId: chefId)
@@ -124,6 +124,16 @@ class MyApp extends StatelessWidget {
           final args = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
             builder: (_) => ShiftListScreen(userId: args['userId']),
+          );
+        } else if (settings.name == '/add_menu') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => AddMenuScreen(role: args['role'] ?? ''),
+          );
+        } else if (settings.name == '/menu') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => MenuScreen(role: args['role'] ?? ''),
           );
         }
         return null;

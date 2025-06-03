@@ -10,7 +10,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+  final String role;
+  const MenuScreen({super.key, required this.role});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -19,11 +20,13 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   final db = DatabaseHelper();
   late Future<Map<Category, List<Dish>>> _menuFuture;
-
+  late final bool isManager;
   @override
   void initState() {
     super.initState();
+    isManager = widget.role == 'Quản lý';
     _menuFuture = _loadMenu();
+    print('Role ở menu: ${widget.role}');
   }
 
   Future<Map<Category, List<Dish>>> _loadMenu() async {
@@ -80,23 +83,48 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
 
       //test
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Thêm món',
-        onPressed: () async {
-          final result = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(builder: (_) => const AddMenuScreen()),
-          );
+      // floatingActionButton: FloatingActionButton(
+      //   tooltip: 'Thêm món',
+      //   onPressed: () async {
+      //     final result = await Navigator.push<bool>(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (_) => AddMenuScreen(role: widget.role),
+      //         // builder: (_) => const AddMenuScreen(),
+      //       ),
+      //     );
 
-          if (result == true) {
-            final future = _loadMenu();
-            setState(() {
-              _menuFuture = future;
-            });
-          }
-        },
-        child: const Icon(Icons.add),
-      ),
+      //     if (result == true) {
+      //       final future = _loadMenu();
+      //       setState(() {
+      //         _menuFuture = future;
+      //       });
+      //     }
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
+      floatingActionButton:
+          isManager
+              ? FloatingActionButton(
+                tooltip: 'Thêm món',
+                onPressed: () async {
+                  final result = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AddMenuScreen(role: widget.role),
+                    ),
+                  );
+
+                  if (result == true) {
+                    final future = _loadMenu();
+                    setState(() {
+                      _menuFuture = future;
+                    });
+                  }
+                },
+                child: const Icon(Icons.add),
+              )
+              : null,
     );
   }
 

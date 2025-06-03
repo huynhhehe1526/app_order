@@ -1,7 +1,7 @@
 class Order {
   final int id;
   final int? customer_id;
-  final String customerName;
+  final String? customerName;
   final int? staffId;
   final String staffName;
   final int table_id;
@@ -16,7 +16,7 @@ class Order {
   Order({
     required this.id,
     this.customer_id,
-    required this.customerName,
+    this.customerName,
     required this.staffId,
     required this.staffName,
     required this.table_id,

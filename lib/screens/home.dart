@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => MenuScreen()),
+          MaterialPageRoute(builder: (_) => MenuScreen(role: widget.role)),
         );
         break;
       case 2:
@@ -98,8 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<GirdItem> _getGridItems(BuildContext ctx) {
     // 1) Khai báo một lần toàn bộ item
     final allItems = <String, GirdItem>{
-      'Đặt bàn': GirdItem(
-        title: 'Đặt bàn',
+      'Bàn': GirdItem(
+        title: 'Bàn',
         icon: const FaIcon(
           FontAwesomeIcons.calendarAlt,
           size: 40,
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap:
             () => Navigator.push(
               ctx,
-              MaterialPageRoute(builder: (_) => MenuScreen()),
+              MaterialPageRoute(builder: (_) => MenuScreen(role: widget.role)),
             ),
       ),
       'Thanh toán': GirdItem(
@@ -129,8 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         onTap: () => Navigator.pushNamed(ctx, '/payment'),
       ),
-      'Đơn hàng': GirdItem(
-        title: 'Đơn hàng',
+      'Đặt bàn': GirdItem(
+        title: 'Đặt bàn',
         icon: const FaIcon(
           FontAwesomeIcons.clipboardList,
           size: 40,
@@ -184,6 +184,16 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
       ),
+      'Chế biến món': GirdItem(
+        title: 'Chế biến món',
+        icon: const FaIcon(
+          FontAwesomeIcons.fire ,
+          size: 40,
+          color: Color.fromARGB(255, 230, 117, 4),
+        ),
+        onTap:
+            () => Navigator.pushNamed(context, '/chef', arguments: widget.id),
+      ),
       'Thống kê doanh thu': GirdItem(
         title: 'Thống kê doanh thu',
         icon: const FaIcon(
@@ -226,11 +236,12 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'nhân viên':
       case 'bếp':
         allowedKeys = [
-          'Đặt bàn',
+          'Bàn',
           'Thực đơn',
           'Thanh toán',
-          'Đơn hàng',
+          'Đặt bàn',
           'Ca làm việc',
+          'Chế biến món',
           'Thống kê doanh thu',
           'Phản hồi của khách hàng',
           'Cài đặt',
@@ -240,10 +251,10 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'khách hàng':
       default:
         allowedKeys = [
-          'Đặt bàn',
+          'Bàn',
           'Thực đơn',
           'Thanh toán',
-          'Đơn hàng',
+          'Đặt bàn',
           'Phản hồi của khách hàng',
           'Cài đặt',
           'Xem thêm',

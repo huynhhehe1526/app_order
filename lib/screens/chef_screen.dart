@@ -12,7 +12,7 @@ class ChefScreen extends StatefulWidget {
 
 class _ChefScreenState extends State<ChefScreen> {
   late List<Map<String, dynamic>> myShiftToday;
-  late List<Map<String, dynamic>> myOrderDetails; // món do bếp này phụ trách
+  late List<Map<String, dynamic>> myOrderDetails; 
 
   @override
   void initState() {
@@ -29,7 +29,7 @@ class _ChefScreenState extends State<ChefScreen> {
             .where(
               (e) =>
                   e['chef_id'] ==
-                      null && // record dành cho staff, không phải chef
+                      null && 
                   e['staff_id'] == widget.chefId &&
                   e['date'] == today,
             )

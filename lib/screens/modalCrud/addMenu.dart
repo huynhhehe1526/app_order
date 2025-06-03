@@ -9,7 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:dt02_nhom09/class/ImgUtil.dart';
 
 class AddMenuScreen extends StatefulWidget {
-  const AddMenuScreen({super.key});
+  final String role;
+  const AddMenuScreen({super.key, required this.role});
 
   @override
   State<AddMenuScreen> createState() => _AddMenuScreenState();
@@ -35,6 +36,7 @@ class _AddMenuScreenState extends State<AddMenuScreen> {
   @override
   void initState() {
     super.initState();
+    // print('Check role ỏ add menu: ${widget.role}');
     _priceController.addListener(_formatPrice);
     _loadCategories();
   }

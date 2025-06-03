@@ -186,7 +186,6 @@ class _TableScreenState extends State<TableScreen>
   }
 
   Future<void> _initData() async {
-    // Lấy danh sách khu vực
     _areas = await _db.getAllAreas();
     if (_areas.isEmpty) return;
 
@@ -196,13 +195,11 @@ class _TableScreenState extends State<TableScreen>
         await _loadTables(_areas[_tabController.index].id!);
       });
 
-    // Tải bàn của khu vực đầu tiên
     await _loadTables(_areas.first.id!);
   }
 
   Future<void> _loadTables(int areaId) async {
     setState(() => _loading = true);
-    // _tables = await _db.getTablesByArea(areaId);getTablesWithAreaNameByAreaId
     _tables = await _db.getTablesWithAreaNameByAreaId(areaId);
     setState(() => _loading = false);
   }

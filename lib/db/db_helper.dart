@@ -2,6 +2,8 @@ import 'package:dt02_nhom09/class/Registrationshift.dart';
 import 'package:dt02_nhom09/class/area.dart';
 import 'package:dt02_nhom09/class/categories.dart';
 import 'package:dt02_nhom09/class/listFood.dart';
+import 'package:dt02_nhom09/class/order_detail.dart';
+import 'package:dt02_nhom09/class/order_model.dart';
 import 'package:dt02_nhom09/class/shift.dart';
 import 'package:dt02_nhom09/class/table_model.dart';
 import 'package:flutter/material.dart';
@@ -309,22 +311,22 @@ class DatabaseHelper {
         //shifts
         await db.insert('Shifts', {
           'shiftname': 'Ca sáng',
-          'start_time': '8h00',
-          'end_time': '13h00',
+          'start_time': '8:00',
+          'end_time': '13:00',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
         await db.insert('Shifts', {
           'shiftname': 'Ca chiều',
-          'start_time': '13h00',
-          'end_time': '18h00',
+          'start_time': '13:00',
+          'end_time': '18:00',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
         await db.insert('Shifts', {
           'shiftname': 'Ca tối',
-          'start_time': '18h30',
-          'end_time': '23h30',
+          'start_time': '18:30',
+          'end_time': '23:59',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
@@ -335,6 +337,14 @@ class DatabaseHelper {
           'status': 'Trống',
           'price': 150000,
           'area_id': 1,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+        await db.insert('Tables', {
+          'seat_count': 8,
+          'status': 'Trống',
+          'price': 150000,
+          'area_id': 2,
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
@@ -659,34 +669,6 @@ class DatabaseHelper {
     }
   }
 
-  /// Ca của HÔM NAY theo role ('Phục vụ' | 'Bếp') – dành cho Quản lý
-  // Future<List<Map<String, dynamic>>> getTodayShiftsByRole(String role) async {
-  //   final db = await database;
-  //   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-  //   final rows = await db.rawQuery(
-  //     '''
-  //   SELECT ssa.id             AS id,
-  //          ssa.table_id,
-  //          ssa.shift_id,
-  //          u.fullname         AS staffName,
-  //          u.id               AS staff_id,
-  //          sh.shiftname,
-  //          sh.start_time,
-  //          sh.end_time
-  //   FROM   StaffShiftArea ssa
-  //   JOIN   users u      ON u.id      = ssa.staff_id
-  //   JOIN   Shifts sh    ON sh.id     = ssa.shift_id
-  //   WHERE  date(ssa.created_at) = ?      -- NGÀY làm việc
-  //      AND u.role              = ?
-  //   ORDER  BY sh.start_time
-  // ''',
-  //     [today, role],
-  //   );
-
-  //   return rows;
-  // }
-
   //test
   Future<List<Map<String, dynamic>>> getTodayShiftsByRole(String role) async {
     final db = await database;
@@ -794,31 +776,6 @@ class DatabaseHelper {
     return rows.map((m) => Area.fromMap(m)).toList();
   }
 
-  /// Trả về danh sách bàn (kèm tên khu vực) mà nhân viên `staffId`
-  /// phụ trách **trong ca hiện tại** của HÔM NAY.
-  // Future<List<TableModel>> getTablesInCurrentShiftByStaff(int staffId) async {
-  //   final db = await database;
-  //   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   final now = DateFormat('HH:mm').format(DateTime.now()); // vd "12:05"
-
-  //   final rows = await db.rawQuery(
-  //     '''
-  //   SELECT t.id, t.seat_count, t.status, t.price,
-  //          t.area_id, t.created_at, t.updated_at,
-  //          a.name AS area_name
-  //   FROM   StaffShiftArea ssa
-  //   JOIN   Shifts  sh ON sh.id = ssa.shift_id
-  //   JOIN   Tables  t  ON t.id  = ssa.table_id
-  //   JOIN   Areas   a  ON a.id  = t.area_id
-  //   WHERE  ssa.staff_id = ?
-  //     AND  date(ssa.created_at) = ?                -- cùng NGÀY đăng ký
-  //     AND  time(?) BETWEEN sh.start_time AND sh.end_time
-  //   ''',
-  //     [staffId, today, now],
-  //   );
-
-  //   return rows.map((m) => TableModel.fromJoinedMap(m)).toList();
-  // }
   Future<List<Map<String, dynamic>>> getOrderWithUserInfo() async {
     final db = await database;
 
@@ -841,6 +798,37 @@ class DatabaseHelper {
     JOIN Areas ar ON ar.id = t.area_id
 
   ''');
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> getOrderWithUserInfoByIdOrder(
+    int orderId,
+  ) async {
+    final db = await database;
+
+    final result = await db.rawQuery(
+      '''
+    SELECT 
+      o.id,
+      o.customer_id,
+      cu.fullname AS customerName,
+      o.staff_id,
+      st.fullname AS staffName,
+      o.table_id,
+      ar.name AS areaName,
+      o.status,
+      o.total_amount,
+      o.note
+    FROM Orders o
+    LEFT JOIN users cu ON o.customer_id = cu.id
+    LEFT JOIN users st ON o.staff_id = st.id
+    JOIN Tables t ON t.id = o.table_id
+    JOIN Areas ar ON ar.id = t.area_id
+    Where o.id = ?
+    ''',
+      [orderId],
+    );
 
     return result;
   }
@@ -938,15 +926,45 @@ class DatabaseHelper {
     return result;
   }
 
+  //Hiển thị một lịch
+  // Future<Map<String, dynamic>?> getTodayScheduleAndArea(int staffId) async {
+  //   final db = await database;
+  //   final now = DateTime.now();
+  //   final today = DateFormat('yyyy-MM-dd').format(now);
+  //   final currentTime = DateFormat('HH:mm').format(now);
+
+  //   final result = await db.rawQuery(
+  //     '''
+  // SELECT s.table_id, sh.start_time, sh.end_time, sh.created_at,
+  //        t.area_id, a.name as area_name
+  // FROM StaffShiftArea s
+  // JOIN Tables t ON s.table_id = t.id
+  // JOIN Areas a ON t.area_id = a.id
+  // JOIN Shifts sh ON s.shift_id = sh.id
+  // WHERE s.staff_id = ?
+  //   AND s.created_at = ?
+
+  //   LIMIT 10
+  // ''',
+  //     [staffId, today],
+  //   );
+
+  //   if (result.isNotEmpty) {
+  //     return result.first;
+  //   }
+  //   return null;
+  // }
+
+  //hiển thị một lịch theo ngày + giờ làm
   Future<Map<String, dynamic>?> getTodayScheduleAndArea(int staffId) async {
     final db = await database;
     final now = DateTime.now();
     final today = DateFormat('yyyy-MM-dd').format(now);
+    // final currentTime = now;
     final currentTime = DateFormat('HH:mm').format(now);
-
     final result = await db.rawQuery(
       '''
-    SELECT s.table_id, sh.start_time, sh.end_time, sh.created_at,
+     SELECT s.table_id, sh.start_time, sh.end_time, sh.created_at,
            t.area_id, a.name as area_name
     FROM StaffShiftArea s
     JOIN Tables t ON s.table_id = t.id
@@ -954,17 +972,91 @@ class DatabaseHelper {
     JOIN Shifts sh ON s.shift_id = sh.id
     WHERE s.staff_id = ?
       AND s.created_at = ?
-      
-    LIMIT 1
+      AND  time(?) BETWEEN time(sh.start_time) AND time(sh.end_time)
+
   ''',
-      [staffId, today],
+      [staffId, today, currentTime],
     );
 
+    // for (var row in result) {
+    //   final startRaw = row['start_time'] as String; // ví dụ: "8h00"
+    //   final endRaw = row['end_time'] as String; // ví dụ: "14h30"
+
+    //   final startTime = parseTime(startRaw);
+    //   final endTime = parseTime(endRaw);
+
+    //   if (startTime != null && endTime != null) {
+    //     final todayStart = DateTime(
+    //       now.year,
+    //       now.month,
+    //       now.day,
+    //       startTime.hour,
+    //       startTime.minute,
+    //     );
+    //     final todayEnd = DateTime(
+    //       now.year,
+    //       now.month,
+    //       now.day,
+    //       endTime.hour,
+    //       endTime.minute,
+    //     );
+
+    //     if (currentTime.isAfter(todayStart) && currentTime.isBefore(todayEnd)) {
+    //       return row;
+    //     }
+    //   }
+    // }
+
+    // return null;
     if (result.isNotEmpty) {
       return result.first;
     }
     return null;
   }
+
+  /// Chuyển "8h00" hoặc "14h30" thành DateTime
+  // TimeOfDay? parseTime(String raw) {
+  //   final parts = raw.toLowerCase().replaceAll('h', ':').split(':');
+  //   if (parts.length >= 2) {
+  //     final hour = int.tryParse(parts[0]);
+  //     final minute = int.tryParse(parts[1]);
+  //     if (hour != null && minute != null) {
+  //       return TimeOfDay(hour: hour, minute: minute);
+  //     }
+  //   }
+  //   return null;
+  // }
+
+  //Hiển thị nhiều lịch
+  // Future<List<Map<String, dynamic>>?> getTodayScheduleAndArea(
+  //   int staffId,
+  // ) async {
+  //   final db = await database;
+  //   final now = DateTime.now();
+  //   final today = DateFormat('yyyy-MM-dd').format(now);
+  //   final currentTime = DateFormat('HH:mm').format(now);
+
+  //   final result = await db.rawQuery(
+  //     '''
+  //   SELECT s.table_id, sh.start_time, sh.end_time, sh.created_at,
+  //          t.area_id, a.name as area_name
+  //   FROM StaffShiftArea s
+  //   JOIN Tables t ON s.table_id = t.id
+  //   JOIN Areas a ON t.area_id = a.id
+  //   JOIN Shifts sh ON s.shift_id = sh.id
+  //   WHERE s.staff_id = ?
+  //     AND s.created_at = ?
+
+  //   LIMIT 10
+  // ''',
+  //     [staffId, today],
+  //   );
+
+  //   if (result.isNotEmpty) {
+  //     return result.toList();
+  //   }
+  //   return null;
+  // }
 
   Future<Area?> getAreaById(int id) async {
     final db = await database;
@@ -983,20 +1075,73 @@ class DatabaseHelper {
   }
 
   Future<TableModel?> getTableById(int id) async {
-    final db = await database; // lấy đối tượng DB (bạn đã khai báo)
+    final db = await database;
 
-    // Truy vấn bản ghi có id = id trong bảng tables
     List<Map<String, dynamic>> result = await db.query(
-      'Tables', // bảng lưu bàn, bạn sửa lại tên bảng đúng
-      where: 'id = ?', // điều kiện truy vấn
-      whereArgs: [id], // tham số truyền vào
+      'Tables',
+      where: 'id = ?',
+      whereArgs: [id],
       limit: 1,
     );
 
     if (result.isNotEmpty) {
       return TableModel.fromMap(result.first);
     } else {
-      return null; // không tìm thấy bàn
+      return null;
     }
+  }
+
+  //insert order
+  Future<int> insertOrder(Order order) async {
+    final db = await database;
+    final orderMap = {
+      'customer_id': order.customer_id,
+      'staff_id': order.staffId,
+      'table_id': order.table_id,
+      'status': order.status,
+      'total_amount': order.totalAmount,
+      'note': order.note,
+      'created_at': order.createdAt.toIso8601String(),
+      'updated_at': order.updatedAt.toIso8601String(),
+    };
+
+    return await db.insert('Orders', orderMap);
+  }
+
+  //insert order detail
+  Future<void> insertOrderDetails(List<OrderDetail> details) async {
+    final db = await database;
+    for (final detail in details) {
+      await db.insert('OrderDetail', detail.toMap());
+    }
+  }
+
+  Future<String?> getNameAreaById(int areaId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'Areas',
+      columns: ['name'],
+      where: 'id = ?',
+      whereArgs: [areaId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['name'] as String;
+    } else {
+      return null;
+    }
+  }
+
+  Future<User?> findUserBySDT(String sdt) async {
+    final db = await database;
+    final result = await db.query(
+      'Users',
+      where: 'phone = ?',
+      whereArgs: [sdt],
+    );
+    if (result.isNotEmpty) {
+      return User.fromMap(result.first);
+    }
+    return null;
   }
 }

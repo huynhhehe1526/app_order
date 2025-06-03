@@ -24,6 +24,16 @@ class Dish {
     this.updatedAt,
   });
 
+  factory Dish.fromJson(Map<String, dynamic> json) {
+    return Dish(
+      id: json['id'],
+      name: json['name'],
+      price: json['price'].toDouble(),
+      categoryId: json['category_id'],
+      status: json['status'],
+    );
+  }
+
   factory Dish.fromMap(Map<String, dynamic> map) => Dish(
     id: map['id'],
     name: map['name'],
@@ -49,4 +59,8 @@ class Dish {
     'created_at': DateTime.now().toIso8601String(),
     'updated_at': DateTime.now().toIso8601String(),
   };
+  @override
+  String toString() {
+    return 'Dish(id: $id, name: $name, price: $price)';
+  }
 }
