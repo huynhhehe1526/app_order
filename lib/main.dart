@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
             builder:
                 (_) => AddOrderScreen(
                   mode: args['mode'] as OrderMode,
+                  id: args['id'] as int,
                   name: args['fullname'] ?? '',
                   role: args['role'] ?? '',
                 ),

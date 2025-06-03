@@ -1080,12 +1080,14 @@ import 'package:dt02_nhom09/screens/order_mode.dart';
 
 class AddOrderScreen extends StatefulWidget {
   final OrderMode mode;
+  final int id;
   final String name;
   final String role;
 
   const AddOrderScreen({
     super.key,
     required this.mode,
+    required this.id,
     required this.name,
     required this.role,
   });
@@ -1108,12 +1110,13 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   /* ---------- flag & dữ liệu riêng cho staff ---------- */
   late final bool isStaff;
   int? staffId;
-  List<Map<String, dynamic>> staffTables = [];
-
+  // List<Map<String, dynamic>> staffTables = [];
+  Set<int> staffTables = {};
   Set<int> staffAreas = {};
 
   List<Area> _listAreas = [];
-
+  //table by areaId
+  List<TableModel> _listTables = [];
   DatabaseHelper db = DatabaseHelper();
 
   /* ------------------------------------------------------------------ */
@@ -1122,34 +1125,128 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   @override
   void initState() {
     super.initState();
+    print('Check id: ${widget.id}, Name:${widget.name}, role: ${widget.role}');
     isStaff = widget.role == 'Nhân viên';
     _loadAreas();
+    // printStaffShifts();
+    // _loadShiftData();
     if (isStaff) {
-      _loadShiftData();
+      // _loadShiftData();
+      checkStaffSchedule(widget.id);
     }
 
     if (isStaff && selectedAreaId != null) _filterTables();
   }
 
-  Future<void> _loadShiftData() async {
-    final u = await db.getUserByUsername(widget.name);
-    if (u == null) return;
+  List<String> areaList = [];
 
-    staffId = u.id;
+  // void checkStaffSchedule(int staffId) async {
+  //   final data = await db.getTodayScheduleAndArea(staffId);
 
-    // Lấy toàn bộ bàn (đã kèm khu vực) nhân viên phụ trách trong ca hiện tại
-    final tablesToday = await db.getAreasInTodayShiftByStaff(staffId!);
+  //   if (data != null) {
+  //     print('Ca: ${getShiftName(data['start_time'], data['end_time'])}');
+  //     print('Giờ bắt đầu: ${data['start_time']}');
+  //     print('Giờ kết thúc: ${data['end_time']}');
+  //     print('Ngày đăng ký: ${data['created_at']}');
+  //     print('Khu vực: ${data['area_name']}');
+  //     _listAreas = data['area_id'];
+  //     staffAreas= data['area_id'].toSet();
 
-    setState(() {
-      staffTables = tablesToday.map((t) => t.toMap()).toList();
-      staffAreas = staffTables.map<int>((t) => t['area_id']).toSet();
+  //   if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
+  //     print('Bàn số: ${data['table_id']}');
+  //   } else {
+  //     print('Hôm nay bạn không có ca làm hoặc không trong thời gian ca.');
+  //   }
+  // }
 
-      if (staffAreas.length == 1) {
-        selectedAreaId = staffAreas.first; // auto-chọn khu vực duy nhất
-        _filterTables(); // và nạp bàn
-      }
-    });
+  // void checkStaffSchedule(int staffId) async {
+  //   final data = await db.getTodayScheduleAndArea(staffId);
+
+  //   if (data != null) {
+  //     print('Ca: ${getShiftName(data['start_time'], data['end_time'])}');
+  //     print('Giờ bắt đầu: ${data['start_time']}');
+  //     print('Giờ kết thúc: ${data['end_time']}');
+  //     print('Ngày đăng ký: ${data['created_at']}');
+  //     print('Khu vực: ${data['area_name']}');
+
+  //     int areaId = data['area_id']; // nhận id khu vực
+
+  //     Area? area = await db.getAreaById(areaId); // hàm lấy Area từ id
+  //     if (area != null) {
+  //       _listAreas = [area]; // Gán List<Area> với phần tử không null
+  //       staffAreas = {area.id!}; //n set với id không null
+  //     } else {
+  //       // Xử lý trường hợp area null (nếu cần)
+  //       _listAreas = [];
+  //       staffAreas = {};
+  //     }
+
+  //     if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
+
+  //     print('Bàn số: ${data['table_id']}');
+  //   } else {
+  //     print('Hôm nay bạn không có ca làm hoặc không trong thời gian ca.');
+  //   }
+  // }
+
+  String getShiftName(String start, String end) {
+    if (start == '08:00' && end == '13:00') return 'Ca sáng';
+    if (start == '13:00' && end == '18:00') return 'Ca chiều';
+    if (start == '18:00' && end == '23:00') return 'Ca tối';
+    return 'Ca khác';
   }
+
+  void checkStaffSchedule(int staffId) async {
+    final data = await db.getTodayScheduleAndArea(staffId);
+
+    if (data != null) {
+      print('Ca: ${getShiftName(data['start_time'], data['end_time'])}');
+      print('Giờ bắt đầu: ${data['start_time']}');
+      print('Giờ kết thúc: ${data['end_time']}');
+      print('Ngày đăng ký: ${data['created_at']}');
+      print('Khu vực: ${data['area_name']}');
+
+      int areaId = data['area_id'];
+      int tableId = data['table_id'];
+
+      Area? area = await db.getAreaById(areaId);
+      if (area != null) {
+        _listAreas = [area];
+        staffAreas = {area.id!};
+        if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
+      } else {
+        _listAreas = [];
+        staffAreas = {};
+      }
+
+      // Lấy bàn theo id
+      TableModel? table = await db.getTableById(tableId);
+
+      if (table != null) {
+        _listTables = [table];
+        staffTables = {table.id!};
+        if (staffTables.length == 1) selectedTableId = staffTables.first;
+      } else {
+        _listTables = [];
+        staffTables = {};
+      }
+
+      print('Bàn số: ${table?.id ?? 'Không có'}');
+    } else {
+      print('Hôm nay bạn không có ca làm hoặc không trong thời gian ca.');
+    }
+  }
+
+  // void printStaffShifts() async {
+  //   final shifts = await DatabaseHelper().getShiftsOfStaff(3);
+  //   for (var shift in shifts) {
+  //     print('Ca: ${shift['shiftname']}');
+  //     print('Giờ bắt đầu: ${shift['start_time']}');
+  //     print('Giờ kết thúc: ${shift['end_time']}');
+  //     print('Ngày đăng ký: ${shift['created_at']}');
+  //     print('---');
+  //   }
+  // }
 
   //show all areas
   Future<void> _loadAreas() async {
@@ -1190,33 +1287,33 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   //   });
   // }
 
-  void _prepareShiftData() async {
-    /* 1. lấy id nhân viên */
-    final u = await db.getUserByUsername(widget.name);
-    if (u == null) {
-      staffTables = [];
-      staffAreas = {};
-      return;
-    }
-    staffId = u.id;
+  // void _prepareShiftData() async {
+  //   /* 1. lấy id nhân viên */
+  //   final u = await db.getUserByUsername(widget.name);
+  //   if (u == null) {
+  //     staffTables = [];
+  //     staffAreas = {};
+  //     return;
+  //   }
+  //   staffId = u.id;
 
-    /* 2. xác định shift hiện tại */
-    final shiftId = _currentShiftId();
-    if (shiftId == null || staffId == null) {
-      staffTables = [];
-      staffAreas = {};
-      return;
-    }
+  //   /* 2. xác định shift hiện tại */
+  //   final shiftId = _currentShiftId();
+  //   if (shiftId == null || staffId == null) {
+  //     staffTables = [];
+  //     staffAreas = {};
+  //     return;
+  //   }
 
-    /* 3. bàn nhân viên phụ trách hôm nay */
-    final today = DateTime.now().toIso8601String().substring(0, 10);
-    final tableIds = await db.getAreasInTodayShiftByStaff(staffId!);
-    staffTables = tables.where((t) => tableIds.contains(t['id'])).toList();
-    staffAreas = staffTables.map<int>((t) => t['area_id']).toSet();
+  //   /* 3. bàn nhân viên phụ trách hôm nay */
+  //   final today = DateTime.now().toIso8601String().substring(0, 10);
+  //   final tableIds = await db.getAreasInTodayShiftByStaff(staffId!);
+  //   staffTables = tables.where((t) => tableIds.contains(t['id'])).toList();
+  //   staffAreas = staffTables.map<int>((t) => t['area_id']).toSet();
 
-    /* 4. nếu chỉ 1 khu vực ⇒ chọn luôn & disable dropdown */
-    if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
-  }
+  //   /* 4. nếu chỉ 1 khu vực ⇒ chọn luôn & disable dropdown */
+  //   if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
+  // }
 
   /* ------------------------------------------------------------------ */
   /*                         SHIFT UTILITIES                            */
@@ -1264,45 +1361,45 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   //           .toList();
   // }
 
-  // void _filterTables() async {
-  //   if (selectedAreaId == null) {
-  //     filteredTables = [];
-  //     return;
-  //   }
-
-  //   // Get tables for the chosen area
-  //   final areaTables = await db.getTablesByArea(selectedAreaId!);
-
-  //   // Convert each TableModel to Map<String, dynamic>
-  //   filteredTables = areaTables.map((t) => t.toMap()).toList();
-  // }
-
   void _filterTables() async {
     if (selectedAreaId == null) {
-      setState(() => filteredTables = []);
+      filteredTables = [];
       return;
     }
 
-    if (isStaff) {
-      // Chỉ các bàn nhân viên này phụ trách
-      setState(() {
-        filteredTables =
-            staffTables.where((t) => t['area_id'] == selectedAreaId).toList();
-      });
-    } else {
-      // Khách hoặc Quản lý: lấy mọi bàn trống trong khu vực
-      final areaTables = await db.getTablesByArea(selectedAreaId!);
-      setState(() {
-        filteredTables =
-            areaTables
-                .map((t) => t.toMap())
-                .where(
-                  (t) => t['status'] != 'Đã đặt' && t['status'] != 'Đang dùng',
-                )
-                .toList();
-      });
-    }
+    // Get tables for the chosen area
+    final areaTables = await db.getTablesByArea(selectedAreaId!);
+
+    // Convert each TableModel to Map<String, dynamic>
+    filteredTables = areaTables.map((t) => t.toMap()).toList();
   }
+
+  // void _filterTables() async {
+  //   if (selectedAreaId == null) {
+  //     setState(() => filteredTables = []);
+  //     return;
+  //   }
+
+  //   if (isStaff) {
+  //     // Chỉ các bàn nhân viên này phụ trách
+  //     setState(() {
+  //       filteredTables =
+  //           staffTables.where((t) => t['area_id'] == selectedAreaId).toList();
+  //     });
+  //   } else {
+  //     // Khách hoặc Quản lý: lấy mọi bàn trống trong khu vực
+  //     final areaTables = await db.getTablesByArea(selectedAreaId!);
+  //     setState(() {
+  //       filteredTables =
+  //           areaTables
+  //               .map((t) => t.toMap())
+  //               .where(
+  //                 (t) => t['status'] != 'Đã đặt' && t['status'] != 'Đang dùng',
+  //               )
+  //               .toList();
+  //     });
+  //   }
+  // }
 
   /* ------------------------------------------------------------------ */
   /*                        UI CALLBACKS                                */
@@ -1341,7 +1438,13 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
             const Divider(),
           ] else ...[
             /* -- Nhân viên: chỉ khu vực/bàn trong ca -- */
-            _areaDropdown(staffAreas.toList()),
+            // _areaDropdown(staffAreas.toList()),
+            _areaDropdown(
+              isStaff
+                  ? staffAreas.toList()
+                  : _listAreas.map((a) => a.id!).toList(),
+            ),
+
             const SizedBox(height: 10),
             _tableDropdown(),
             TextField(
@@ -1392,44 +1495,17 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   }
 
   /* ---------------------- WIDGET HELPERS ------------------------------------- */
-  // Widget _areaDropdown(List<int> areaIds) {
-  //   return DropdownButtonFormField<int>(
-  //     decoration: const InputDecoration(labelText: 'Khu vực'),
-  //     value: selectedAreaId,
-  //     items:
-  //         areaIds
-  //             .map(
-  //               (id) => DropdownMenuItem(
-  //                 value: id,
-  //                 child: Text(_listAreas.firstWhere((a) => a.id == id).name),
-  //                 // Text(areas.firstWhere((a) => a['id'] == id)['name']),
-  //               ),
-  //             )
-  //             .toList(),
-  //     onChanged: (isStaff && areaIds.length == 1) ? null : onSelectArea,
-  //     disabledHint: Text(
-  //       isStaff
-  //           ? (areaIds.isEmpty
-  //               ? 'Không có ca hôm nay'
-  //               : areas.firstWhere((a) => a['id'] == areaIds.first)['name'])
-  //           : 'Chọn khu vực',
-  //     ),
-  //   );
-  // }
+
   Widget _areaDropdown(List<int> areaIds) {
     return DropdownButtonFormField<int>(
       decoration: const InputDecoration(labelText: 'Khu vực'),
       value: selectedAreaId,
       items:
-          areaIds
-              .map(
-                (id) => DropdownMenuItem(
-                  value: id,
-                  child: Text(_listAreas.firstWhere((a) => a.id == id).name),
-                ),
-              )
-              .toList(),
-      onChanged: (isStaff && areaIds.length == 1) ? null : onSelectArea,
+          areaIds.map((id) {
+            final area = _listAreas.firstWhere((a) => a.id == id);
+            return DropdownMenuItem(value: id, child: Text(area.name));
+          }).toList(),
+      onChanged:  onSelectArea,
       disabledHint: Text(
         isStaff
             ? (areaIds.isEmpty
@@ -1441,21 +1517,25 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   }
 
   Widget _tableDropdown() {
+    final isDropdownDisabled = selectedAreaId == null || filteredTables.isEmpty;
+
     return DropdownButtonFormField<int>(
       decoration: const InputDecoration(labelText: 'Chọn bàn'),
       value: selectedTableId,
       items:
-          filteredTables
-              .map(
-                (t) => DropdownMenuItem(
-                  value: t['id'] as int,
-                  child: Text(
-                    'Bàn ${t['id']} • ${t['seat_count']} chỗ • ${t['status']}',
-                  ),
-                ),
-              )
-              .toList(),
-      onChanged: filteredTables.isEmpty ? null : onSelectTable,
+          isDropdownDisabled
+              ? null
+              : filteredTables
+                  .map(
+                    (t) => DropdownMenuItem<int>(
+                      value: t['id'] as int,
+                      child: Text(
+                        'Bàn ${t['id']} • ${t['seat_count']} chỗ • ${t['status']}',
+                      ),
+                    ),
+                  )
+                  .toList(),
+      onChanged: isDropdownDisabled ? null : onSelectTable,
       disabledHint: Text(
         selectedAreaId == null
             ? (isStaff
@@ -1465,6 +1545,32 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
       ),
     );
   }
+
+  // Widget _tableDropdown() {
+  //   return DropdownButtonFormField<int>(
+  //     decoration: const InputDecoration(labelText: 'Chọn bàn'),
+  //     value: selectedTableId,
+  //     items:
+  //         filteredTables
+  //             .map(
+  //               (t) => DropdownMenuItem(
+  //                 value: t['id'] as int,
+  //                 child: Text(
+  //                   'Bàn ${t['id']} • ${t['seat_count']} chỗ • ${t['status']}',
+  //                 ),
+  //               ),
+  //             )
+  //             .toList(),
+  //     onChanged: filteredTables.isEmpty ? null : onSelectTable,
+  //     disabledHint: Text(
+  //       selectedAreaId == null
+  //           ? (isStaff
+  //               ? 'Chọn khu vực (trong ca)'
+  //               : 'Vui lòng chọn khu vực trước')
+  //           : 'Chưa có bàn trống ở khu vực này',
+  //     ),
+  //   );
+  // }
 
   Widget _timePickerRow() => Row(
     children: [

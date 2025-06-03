@@ -343,6 +343,7 @@
 //test
 //test
 import 'package:dt02_nhom09/db/db_helper.dart';
+import 'package:dt02_nhom09/screens/modalCrud/addOrderScreen.dart';
 import 'package:flutter/material.dart';
 import './order_mode.dart';
 import 'package:dt02_nhom09/screens/data/mock_data.dart';
@@ -495,6 +496,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     widget.role == 'Khách'
                         ? OrderMode.customerOnline
                         : OrderMode.staffWalkIn,
+                'id': widget.id,
                 'name': widget.name,
                 'role': widget.role,
               },
@@ -590,49 +592,144 @@ class _OrderScreenState extends State<OrderScreen> {
       //   tooltip: "Thêm đơn hàng",
       //   child: const Icon(Icons.add),
       // ),
+
+      //ngon
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     // Xác định mode theo role
+
+      //     OrderMode mode;
+      //     if (widget.role == "Khách") {
+      //       mode = OrderMode.customerOnline;
+      //     } else {
+      //       mode = OrderMode.staffWalkIn;
+      //     }
+
+      //     // final newOrder = await Navigator.pushNamed(
+      //     //   context,
+      //     //   '/add_order',
+      //     //   arguments: {'mode': mode},
+      //     // );
+      //     final newOrder = await Navigator.pushNamed(
+      //       context,
+      //       '/add_order',
+      //       arguments: {
+      //         'mode':
+      //             widget.role == 'Khách'
+      //                 ? OrderMode.customerOnline
+      //                 : OrderMode.staffWalkIn,
+      //         'name': widget.name,
+      //         'role': widget.role,
+      //       },
+      //     );
+
+      //     if (newOrder != null && newOrder is Map<String, dynamic>) {
+      //       setState(() {
+      //         final newId =
+      //             displayOrders.isNotEmpty
+      //                 ? (displayOrders.last['id'] as int) + 1
+      //                 : 1;
+      //         newOrder['id'] = newId;
+
+      //         if (newOrder['details'] == null || newOrder['details'] is! List) {
+      //           newOrder['details'] = [];
+      //         }
+
+      //         displayOrders.add(newOrder);
+      //       });
+      //     }
+      //   },
+      //   tooltip: "Thêm đơn hàng",
+      //   child: const Icon(Icons.add),
+      // ),
+
+      //test
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Xác định mode theo role
-
-          OrderMode mode;
-          if (widget.role == "Khách") {
-            mode = OrderMode.customerOnline;
-          } else {
-            mode = OrderMode.staffWalkIn;
-          }
-
-          // final newOrder = await Navigator.pushNamed(
-          //   context,
-          //   '/add_order',
-          //   arguments: {'mode': mode},
-          // );
-          final newOrder = await Navigator.pushNamed(
-            context,
-            '/add_order',
-            arguments: {
-              'mode':
-                  widget.role == 'Khách'
-                      ? OrderMode.customerOnline
-                      : OrderMode.staffWalkIn,
-              'name': widget.name,
-              'role': widget.role,
+          // Hiển thị dialog hiện tên và role
+          final proceed = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Thông tin người dùng'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Tên: ${widget.name}'),
+                    SizedBox(height: 8),
+                    Text('Vai trò: ${widget.role}'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(
+                        context,
+                      ).pop(false);
+                    },
+                    child: Text('Hủy'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
             },
           );
 
-          if (newOrder != null && newOrder is Map<String, dynamic>) {
-            setState(() {
-              final newId =
-                  displayOrders.isNotEmpty
-                      ? (displayOrders.last['id'] as int) + 1
-                      : 1;
-              newOrder['id'] = newId;
+          if (proceed == true) {
+            // Nếu người dùng OK, chuyển màn thêm đơn hàng
+            OrderMode mode;
+            if (widget.role == "Khách") {
+              mode = OrderMode.customerOnline;
+            } else {
+              mode = OrderMode.staffWalkIn;
+            }
 
-              if (newOrder['details'] == null || newOrder['details'] is! List) {
-                newOrder['details'] = [];
-              }
+            // final newOrder = await Navigator.pushNamed(
+            //   context,
+            //   '/add_order',
+            //   arguments: {
+            //     'mode': mode,
+            //     'name': widget.name,
+            //     'role': widget.role,
+            //   },
+            // );
 
-              displayOrders.add(newOrder);
-            });
+            print("OrderScreen: name = ${widget.name}");
+            final newOrder = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => AddOrderScreen(
+                      mode: mode,
+                      id: widget.id,
+                      role: widget.role,
+                      name: widget.name,
+                    ),
+              ),
+            );
+
+            if (newOrder != null && newOrder is Map<String, dynamic>) {
+              setState(() {
+                final newId =
+                    displayOrders.isNotEmpty
+                        ? (displayOrders.last['id'] as int) + 1
+                        : 1;
+                newOrder['id'] = newId;
+
+                if (newOrder['details'] == null ||
+                    newOrder['details'] is! List) {
+                  newOrder['details'] = [];
+                }
+
+                displayOrders.add(newOrder);
+              });
+            }
           }
         },
         tooltip: "Thêm đơn hàng",

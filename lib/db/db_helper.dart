@@ -324,7 +324,7 @@ class DatabaseHelper {
         await db.insert('Shifts', {
           'shiftname': 'Ca tối',
           'start_time': '18h30',
-          'end_time': '22h30',
+          'end_time': '23h30',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
@@ -870,5 +870,133 @@ class DatabaseHelper {
     );
 
     return result;
+  }
+
+  // Thêm vào DatabaseHelper
+  Future<List<Area>> getAreasForStaffCurrentShift(int staffId) async {
+    final db = await database;
+
+    // 1. Giờ hiện tại dạng HH:mm
+    final nowStr = DateFormat('HH:mm').format(DateTime.now());
+
+    /* 2. Lấy DISTINCT khu vực nhân viên đang trực trong ca khớp giờ hiện tại */
+    final rows = await db.rawQuery(
+      '''
+    SELECT DISTINCT a.id, a.name
+    FROM   StaffShiftArea  ssa
+    JOIN   Shifts          sh ON sh.id = ssa.shift_id
+    JOIN   Tables          t  ON t.id  = ssa.table_id
+    JOIN   Areas           a  ON a.id  = t.area_id
+    WHERE  ssa.staff_id    = ?
+      AND  time(?) BETWEEN time(sh.start_time) AND time(sh.end_time)
+  ''',
+      [staffId, nowStr],
+    );
+
+    return rows.map((m) => Area.fromMap(m)).toList();
+  }
+
+  /* (tuỳ chọn) Lấy tất cả bàn của nhân viên trong ca hiện tại */
+  Future<List<TableModel>> getTablesForStaffCurrentShift(int staffId) async {
+    final db = await database;
+    final nowStr = DateFormat('HH:mm').format(DateTime.now());
+
+    final rows = await db.rawQuery(
+      '''
+    SELECT t.*
+    FROM   StaffShiftArea ssa
+    JOIN   Shifts         sh ON sh.id = ssa.shift_id
+    JOIN   Tables         t  ON t.id  = ssa.table_id
+    WHERE  ssa.staff_id   = ?
+      AND  time(?) BETWEEN time(sh.start_time) AND time(sh.end_time)
+  ''',
+      [staffId, nowStr],
+    );
+
+    return rows.map((m) => TableModel.fromMap(m)).toList();
+  }
+
+  //hiển thị ca làm của nhân viên có id là 3
+  Future<List<Map<String, dynamic>>> getShiftsOfStaff(int staffId) async {
+    final db = await database;
+
+    final result = await db.rawQuery(
+      '''
+    SELECT 
+      s.shiftname,
+      s.start_time,
+      s.end_time,
+      sa.created_at
+    FROM StaffShiftArea sa
+    JOIN Shifts s ON sa.shift_id = s.id
+    WHERE sa.staff_id = ?
+    ORDER BY sa.created_at DESC
+  ''',
+      [staffId],
+    );
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>?> getTodayScheduleAndArea(int staffId) async {
+    final db = await database;
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final currentTime = DateFormat('HH:mm').format(now);
+
+    final result = await db.rawQuery(
+      '''
+    SELECT s.table_id, sh.start_time, sh.end_time, sh.created_at,
+           t.area_id, a.name as area_name
+    FROM StaffShiftArea s
+    JOIN Tables t ON s.table_id = t.id
+    JOIN Areas a ON t.area_id = a.id
+    JOIN Shifts sh ON s.shift_id = sh.id
+    WHERE s.staff_id = ?
+      AND s.created_at = ?
+      
+    LIMIT 1
+  ''',
+      [staffId, today],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
+
+  Future<Area?> getAreaById(int id) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Areas',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Area.fromMap(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<TableModel?> getTableById(int id) async {
+    final db = await database; // lấy đối tượng DB (bạn đã khai báo)
+
+    // Truy vấn bản ghi có id = id trong bảng tables
+    List<Map<String, dynamic>> result = await db.query(
+      'Tables', // bảng lưu bàn, bạn sửa lại tên bảng đúng
+      where: 'id = ?', // điều kiện truy vấn
+      whereArgs: [id], // tham số truyền vào
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      return TableModel.fromMap(result.first);
+    } else {
+      return null; // không tìm thấy bàn
+    }
   }
 }
