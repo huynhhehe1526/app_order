@@ -538,15 +538,27 @@ class _MenuScreenState extends State<MenuScreen> {
                                   () => Navigator.pop(context), // Đóng dialog
                               child: Text('Hủy'),
                             ),
+
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     Navigator.pop(context); // Đóng dialog
+                            //     Navigator.pop(
+                            //       context,
+                            //       _selectedDishes,
+                            //     ); // Trả về danh sách
+                            //   },
+                            //   child: Text('Xác nhận'),
+                            // ),
                             ElevatedButton(
+                              child: const Text('Xác nhận'),
                               onPressed: () {
-                                Navigator.pop(context); // Đóng dialog
-                                Navigator.pop(
+                                Navigator.of(context).pop(); // đóng dialog
+                                // pop MenuScreen và trả ra List<Dish>
+                                Navigator.of(
                                   context,
-                                  _selectedDishes,
-                                ); // Trả về danh sách
+                                  rootNavigator: true,
+                                ).pop(_selectedDishes.toList());
                               },
-                              child: Text('Xác nhận'),
                             ),
                           ],
                         ),

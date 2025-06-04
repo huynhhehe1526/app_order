@@ -117,107 +117,105 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
             return const Center(child: CircularProgressIndicator());
           final list = snap.data!;
           if (list.isEmpty) return const Center(child: Text('Chưa có ca làm'));
-
-          return ListView.separated(
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemCount: list.length,
-            separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (_, i) {
               final s = list[i];
-              // return ListTile(
-              //   leading: const Icon(Icons.schedule),
-              //   title: Text('${s.shiftName}: ${s.startTime} - ${s.endTime}'),
-              //   subtitle:
-              //       widget.userId != null
-              //           ? Text('Bàn: ${s.table_id ?? '-'}')
-              //           : Text(
-              //             'NV: ${s.staffName}  |  Bàn: ${s.table_id ?? '-'}',
-              //           ),
-              // );
+              final status = getShiftStatus(s.startTime, s.endTime);
 
-              //test
-              // return Container(
-              //   decoration: BoxDecoration(
-              //     border:
-              //         isCurrentShift(s.startTime, s.endTime)
-              //             ? Border.all(color: Colors.green, width: 2)
-              //             : null,
-              //     borderRadius: BorderRadius.circular(8),
-              //     color:
-              //         isCurrentShift(s.startTime, s.endTime)
-              //             ? Colors.green.withOpacity(0.1)
-              //             : null,
-              //   ),
-              //   child: ListTile(
-              //     leading: Icon(
-              //       Icons.schedule,
-              //       color:
-              //           isCurrentShift(s.startTime, s.endTime)
-              //               ? Colors.green
-              //               : null,
-              //     ),
-              //     title: Text('${s.shiftName}: ${s.startTime} - ${s.endTime}'),
-              //     subtitle:
-              //         widget.userId != null
-              //             ? Text('Bàn: ${s.table_id ?? '-'}')
-              //             : Text(
-              //               'NV: ${s.staffName}  |  Bàn: ${s.table_id ?? '-'}',
-              //             ),
-              //   ),
-              // );
+              final icon =
+                  {
+                    ShiftStatus.ongoing: Icons.timer,
+                    ShiftStatus.upcoming: Icons.schedule,
+                    ShiftStatus.ended: Icons.lock_clock,
+                  }[status];
 
-              //test cuối
-              // return ListTile(
-              //   leading:
-              //       isCurrentShift(s.startTime, s.endTime)
-              //           ? Icon(
-              //             Icons.timer,
-              //             color: Colors.green,
-              //           ) // Ca đang làm → icon khác
-              //           : Icon(Icons.schedule),
-              //   title: Text('${s.shiftName}: ${s.startTime} - ${s.endTime}'),
-              //   subtitle:
-              //       widget.userId != null
-              //           ? Text('Bàn: ${s.table_id ?? '-'}')
-              //           : Text(
-              //             'NV: ${s.staffName}  |  Bàn: ${s.table_id ?? '-'} |  Khu vực: ${s.areaName ?? '-'}',
-              //           ),
-              // );
+              final color =
+                  {
+                    ShiftStatus.ongoing: Colors.green,
+                    ShiftStatus.upcoming: Colors.blueGrey,
+                    ShiftStatus.ended: Colors.red,
+                  }[status];
 
-              //tessssssssssss
-              return ListTile(
-                leading: Icon(
-                  () {
-                    final status = getShiftStatus(s.startTime, s.endTime);
-                    switch (status) {
-                      case ShiftStatus.ongoing:
-                        return Icons.timer; // đang làm
-                      case ShiftStatus.upcoming:
-                        return Icons.schedule; // chưa đến
-                      case ShiftStatus.ended:
-                        return Icons.lock_clock; // đã kết thúc
-                    }
-                  }(),
-                  color: () {
-                    final status = getShiftStatus(s.startTime, s.endTime);
-                    switch (status) {
-                      case ShiftStatus.ongoing:
-                        return Colors.green;
-                      case ShiftStatus.upcoming:
-                        return Colors.blueGrey;
-                      case ShiftStatus.ended:
-                        return Colors.red;
-                    }
-                  }(),
-                ),
-                title: Text('${s.shiftName}: ${s.startTime} - ${s.endTime}'),
-                subtitle:
-                    widget.userId != null
-                        ? Text(
-                          'Bàn: ${s.table_id ?? '-'} | Khu vực: ${s.areaName ?? '-'}',
-                        )
-                        : Text(
-                          'NV: ${s.staffName} | Bàn: ${s.table_id ?? '-'} | Khu vực: ${s.areaName ?? '-'}',
+              final statusText =
+                  {
+                    ShiftStatus.ongoing: 'Đang làm',
+                    ShiftStatus.upcoming: 'Sắp tới',
+                    ShiftStatus.ended: 'Đã kết thúc',
+                  }[status]!;
+
+              return GestureDetector(
+                onTap: () {
+                  // mở chi tiết ca làm nếu muốn
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: color!.withOpacity(0.1),
+                          shape: BoxShape.circle,
                         ),
+                        child: Icon(icon, color: color, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${s.shiftName} (${s.startTime} - ${s.endTime})',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.userId != null
+                                  ? 'Bàn: ${s.table_id ?? '-'} | Khu vực: ${s.areaName ?? '-'}'
+                                  : 'NV: ${s.staffName} | Bàn: ${s.table_id ?? '-'} | Khu vực: ${s.areaName ?? '-'}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(Icons.circle, size: 10, color: color),
+                                const SizedBox(width: 6),
+                                Text(
+                                  statusText,
+                                  style: TextStyle(
+                                    color: color,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           );

@@ -1,156 +1,4 @@
-// import 'package:flutter/material.dart';
-
-// class TableScreen extends StatefulWidget {
-//   const TableScreen({super.key});
-
-//   @override
-//   _TableScreenState createState() => _TableScreenState();
-// }
-
-// // const TableScreen({super.key});
-// class _TableScreenState extends State<TableScreen> {
-//   final List<String> tables = ["Bàn 1", "Bàn 2", "Bàn 3", "Bàn 4"];
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text("Chọn Bàn")),
-//       body: GridView.builder(
-//         padding: EdgeInsets.all(10),
-//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//           crossAxisCount: 2,
-//           childAspectRatio: 1.2,
-//         ),
-//         itemCount: tables.length,
-//         itemBuilder: (context, index) {
-//           return GestureDetector(
-//             onTap: () {
-//               Navigator.pushNamed(context, '/menu', arguments: tables[index]);
-//             },
-//             child: Card(
-//               color: Colors.green[100],
-//               child: Center(
-//                 child: Text(tables[index], style: TextStyle(fontSize: 20)),
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-//tets giao diện
-// import 'package:flutter/material.dart';
-// import 'package:dt02_nhom09/screens/data/mock_data.dart';
-
-// class TableScreen extends StatelessWidget {
-
-//   Color getStatusColor(String status) {
-//     switch (status) {
-//       case 'Trống':
-//         return Colors.green;
-//       case 'Đã đặt':
-//         return Colors.orange;
-//       case 'Đang dùng':
-//         return Colors.red;
-//       default:
-//         return Colors.grey;
-//     }
-//   }
-
-//   IconData getStatusIcon(String status) {
-//     switch (status) {
-//       case 'Trống':
-//         return Icons.check_circle;
-//       case 'Đã đặt':
-//         return Icons.schedule;
-//       case 'Đang dùng':
-//         return Icons.dining;
-//       default:
-//         return Icons.help;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Danh sách bàn'),
-//         backgroundColor: Colors.teal,
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(10.0),
-//         child: GridView.builder(
-//           itemCount: tables.length,
-//           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//             crossAxisCount: 2, // 2 columns
-//             childAspectRatio: 3 / 2.5,
-//             crossAxisSpacing: 10,
-//             mainAxisSpacing: 10,
-//           ),
-//           itemBuilder: (context, index) {
-//             final table = tables[index];
-//             final statusColor = getStatusColor(table['status']!);
-//             final statusIcon = getStatusIcon(table['status']!);
-
-//             return Card(
-//               elevation: 4,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(15),
-//               ),
-//               child: Container(
-//                 padding: EdgeInsets.all(10),
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(15),
-//                   border: Border.all(color: statusColor, width: 2),
-//                 ),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       "Bàn số ${table['id']}",
-//                       style: TextStyle(
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 16,
-//                       ),
-//                     ),
-//                     SizedBox(height: 4),
-//                     Text("Khu vực: ${table['area_name']}"),
-//                     Text("Số ghế: ${table['seat_count']}"),
-//                     Text("Giá: ${table['price']}đ"),
-//                     SizedBox(height: 8),
-//                     Container(
-//                       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-//                       decoration: BoxDecoration(
-//                         color: statusColor.withOpacity(0.2),
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Icon(statusIcon, size: 16, color: statusColor),
-//                           SizedBox(width: 4),
-//                           Text(
-//                             table['status']!,
-//                             style: TextStyle(
-//                               color: statusColor,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//testtttttttttt'
+//test UI
 import 'package:flutter/material.dart';
 import 'package:dt02_nhom09/db/db_helper.dart';
 import 'package:dt02_nhom09/class/area.dart';
@@ -171,13 +19,6 @@ class _TableScreenState extends State<TableScreen>
   List<Area> _areas = [];
   List<TableModel> _tables = [];
   bool _loading = true;
-  String getAreaNameById(int areaId) {
-    final area = _areas.firstWhere(
-      (a) => a.id == areaId,
-      orElse: () => Area(id: 0, name: 'Không rõ'),
-    );
-    return area.name;
-  }
 
   @override
   void initState() {
@@ -204,46 +45,51 @@ class _TableScreenState extends State<TableScreen>
     setState(() => _loading = false);
   }
 
-  // ---------- Helpers ----------
   Color _statusColor(String status) {
     switch (status) {
       case 'Trống':
-        return Colors.green;
+        return Colors.green.shade600;
       case 'Đã đặt':
-        return Colors.orange;
+        return Colors.orange.shade700;
       case 'Đang dùng':
-        return Colors.red;
+        return Colors.red.shade600;
       default:
-        return Colors.grey;
+        return Colors.grey.shade400;
     }
   }
 
   IconData _statusIcon(String status) {
     switch (status) {
       case 'Trống':
-        return Icons.check_circle;
+        return Icons.chair_alt;
       case 'Đã đặt':
-        return Icons.schedule;
+        return Icons.event_available_outlined;
       case 'Đang dùng':
-        return Icons.restaurant; // dining bị deprecate
+        return Icons.fastfood;
       default:
-        return Icons.help;
+        return Icons.help_outline;
     }
   }
 
-  // ---------- UI ----------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Danh sách bàn theo khu vực'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.teal.shade700,
         bottom:
             _areas.isEmpty
                 ? null
                 : TabBar(
                   controller: _tabController,
                   isScrollable: true,
+                  // indicatorColor: Colors.white,
+                  indicatorColor: Colors.yellow, 
+                  labelColor: Colors.yellow, 
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                   tabs: _areas.map((e) => Tab(text: e.name)).toList(),
                 ),
       ),
@@ -251,76 +97,123 @@ class _TableScreenState extends State<TableScreen>
           _loading
               ? const Center(child: CircularProgressIndicator())
               : _tables.isEmpty
-              ? const Center(child: Text('Không có bàn trong khu vực này'))
+              ? const Center(
+                child: Text(
+                  'Không có bàn trong khu vực này',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              )
               : Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: GridView.builder(
                   itemCount: _tables.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 3 / 2.5,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    childAspectRatio: 4 / 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                   ),
                   itemBuilder: (_, index) {
                     final table = _tables[index];
-                    final color = _statusColor(table.status);
-                    final icon = _statusIcon(table.status);
+                    final statusColor = _statusColor(table.status);
+                    final statusIcon = _statusIcon(table.status);
 
-                    return Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: color, width: 2),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bàn số ${table.id}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text('Khu vực: ${table.areaName}'),
-                            Text('Số ghế: ${table.seatCount}'),
-                            // Text('Giá: ${table.price.toStringAsFixed(0)}đ'),
-                            Text(
-                              'Giá: ${(table.price ?? 0).toStringAsFixed(0)}đ',
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: color.withOpacity(.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
+                    return Material(
+                      borderRadius: BorderRadius.circular(16),
+                      elevation: 6,
+                      shadowColor: statusColor.withOpacity(0.4),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          // TODO: thêm hành động khi bấm vào bàn
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.white,
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Bàn số & icon status ở trên cùng
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(icon, size: 16, color: color),
-                                  const SizedBox(width: 4),
                                   Text(
-                                    table.status,
-                                    style: TextStyle(
-                                      color: color,
+                                    'Bàn số ${table.id}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Icon(
+                                    statusIcon,
+                                    color: statusColor,
+                                    size: 28,
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              // Khu vực & số ghế
+                              Text(
+                                'Khu vực: ${table.areaName}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Số ghế: ${table.seatCount}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+
+                              const Spacer(),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${(table.price ?? 0).toStringAsFixed(0)}đ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                      horizontal: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      table.status,
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );

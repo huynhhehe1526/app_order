@@ -12,7 +12,7 @@ class ChefScreen extends StatefulWidget {
 
 class _ChefScreenState extends State<ChefScreen> {
   late List<Map<String, dynamic>> myShiftToday;
-  late List<Map<String, dynamic>> myOrderDetails; 
+  late List<Map<String, dynamic>> myOrderDetails;
 
   @override
   void initState() {
@@ -28,8 +28,7 @@ class _ChefScreenState extends State<ChefScreen> {
         staffShiftAreas
             .where(
               (e) =>
-                  e['chef_id'] ==
-                      null && 
+                  e['chef_id'] == null &&
                   e['staff_id'] == widget.chefId &&
                   e['date'] == today,
             )
@@ -72,7 +71,15 @@ class _ChefScreenState extends State<ChefScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Màn hình Bếp'),
-        backgroundColor: Colors.brown.shade400,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.red],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async => setState(_loadData),

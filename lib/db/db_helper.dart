@@ -372,6 +372,14 @@ class DatabaseHelper {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
+        await db.insert('Tables', {
+          'seat_count': 12,
+          'status': 'Đã đặt',
+          'price': 500000,
+          'area_id': 2,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
 
         //Staff enroll shift by area
         await db.insert('StaffShiftArea', {

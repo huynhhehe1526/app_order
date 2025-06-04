@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'Chế biến món': GirdItem(
         title: 'Chế biến món',
         icon: const FaIcon(
-          FontAwesomeIcons.fire ,
+          FontAwesomeIcons.fire,
           size: 40,
           color: Color.fromARGB(255, 230, 117, 4),
         ),
