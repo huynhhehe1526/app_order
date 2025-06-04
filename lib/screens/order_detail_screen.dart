@@ -107,6 +107,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Future<void> loadOrderDetails() async {
     // Gọi hàm async lấy chi tiết món theo order_id
     final details = await db.getOrderDetailsByOrderId(widget.order['id']);
+    print('Check detail bên orderdetaiL: $details');
     setState(() {
       orderDetails = details;
     });

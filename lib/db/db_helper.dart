@@ -29,8 +29,8 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'restaurant_app.db');
 
-    print('Opening database at $path'); // Debug thêm
-    await deleteDatabase(path);
+    print('Opening database at $path');
+    // await deleteDatabase(path);
     return await openDatabase(
       path,
       version: 1,
@@ -802,6 +802,21 @@ class DatabaseHelper {
     return result;
   }
 
+  Future<Map<String, dynamic>?> getOrderById(int id) async {
+    final dbClient = await database;
+    final result = await dbClient.query(
+      'Orders',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    } else {
+      return null;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getOrderWithUserInfoByIdOrder(
     int orderId,
   ) async {
@@ -841,6 +856,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> result = await db.rawQuery(
       '''
     SELECT 
+      od.id,
       od.order_id, 
       od.dish_id, 
       d.name AS dish_name, 
@@ -851,7 +867,7 @@ class DatabaseHelper {
     FROM OrderDetail od
     JOIN Orders o ON od.order_id = o.id
     JOIN Dishes d ON od.dish_id = d.id
-    JOIN users u ON od.chef_id = u.id
+    LEFT JOIN users u ON od.chef_id = u.id
     WHERE od.order_id = ?
   ''',
       [orderId],
@@ -864,10 +880,8 @@ class DatabaseHelper {
   Future<List<Area>> getAreasForStaffCurrentShift(int staffId) async {
     final db = await database;
 
-    // 1. Giờ hiện tại dạng HH:mm
     final nowStr = DateFormat('HH:mm').format(DateTime.now());
 
-    /* 2. Lấy DISTINCT khu vực nhân viên đang trực trong ca khớp giờ hiện tại */
     final rows = await db.rawQuery(
       '''
     SELECT DISTINCT a.id, a.name

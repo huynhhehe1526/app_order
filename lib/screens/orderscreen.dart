@@ -303,22 +303,60 @@ class _OrderScreenState extends State<OrderScreen> {
 
             print('Check order mới bên orderscreen $newOrder');
 
-            if (newOrder != null && newOrder is Map<String, dynamic>) {
-              setState(() {
-                final newId =
-                    displayOrders.isNotEmpty
-                        ? (displayOrders.last['id'] as int) + 1
-                        : 1;
-                newOrder['id'] = newId;
+            // if (newOrder != null && newOrder is Map<String, dynamic>) {
+            //   setState(() {
+            //     final newId =
+            //         displayOrders.isNotEmpty
+            //             ? (displayOrders.last['id'] as int) + 1
+            //             : 1;
+            //     newOrder['id'] = newId;
 
-                // if (newOrder['details'] == null ||
-                //     newOrder['details'] is! List) {
-                //   newOrder['details'] = [];
-                // }
+            //     // if (newOrder['details'] == null ||
+            //     //     newOrder['details'] is! List) {
+            //     //   newOrder['details'] = [];
+            //     // }
 
-                displayOrders.add(newOrder);
-              });
+            //     displayOrders.add(newOrder);
+            //   });
+            // }
+
+            //test cuối
+            if (newOrder != null && newOrder is int) {
+              final orderInfo = await db.getOrderById(
+                newOrder,
+              ); // Map<String, dynamic>?
+              print('Order info: $orderInfo');
+              if (orderInfo != null) {
+                final orderDetails = await db.getOrderDetailsByOrderId(
+                  newOrder,
+                ); // List<Map<String,dynamic>>
+                print('Order details: $orderDetails');
+                final fullOrder = {...orderInfo, 'details': orderDetails};
+                setState(() {
+                  displayOrders.add(fullOrder);
+                });
+                print('DisplayOrders: $displayOrders');
+              }
             }
+
+            final orderDt = await db.getOrderDetailsByOrderId(newOrder);
+            print('Check order detail bên orderscreen: $orderDt');
+            // if (newOrder != null && newOrder is Map<String, dynamic>) {
+            //   setState(() {
+            //     final newId =
+            //         displayOrders.isNotEmpty
+            //             ? (displayOrders.last['id'] as int)
+            //             : 1;
+            //     newOrder['id'] = newId;
+
+            //     // if (newOrder['details'] == null ||
+            //     //     newOrder['details'] is! List) {
+            //     //   newOrder['details'] = [];
+            //     // }
+
+            //     displayOrders.add(newOrder);
+            //   });
+            // }
           }
         },
         tooltip: "Thêm đơn hàng",

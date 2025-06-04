@@ -34,7 +34,7 @@ class OrderDetail {
 
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) 'id': id,
+      // if (id != null) 'id': id,
       'order_id': orderId,
       'dish_id': dishId,
       'quantity': quantity,
