@@ -1,9 +1,10 @@
+//test DB
+import 'package:dt02_nhom09/class/listFood.dart';
+import 'package:dt02_nhom09/db/db_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'data/mock_data.dart';
 
 class ChefScreen extends StatefulWidget {
-  final int chefId; // id của user role "Bếp"
+  final int chefId;
   const ChefScreen({super.key, required this.chefId});
 
   @override
@@ -11,48 +12,54 @@ class ChefScreen extends StatefulWidget {
 }
 
 class _ChefScreenState extends State<ChefScreen> {
-  late List<Map<String, dynamic>> myShiftToday;
-  late List<Map<String, dynamic>> myOrderDetails;
+  List<Map<String, dynamic>> myOrderDetails = [];
+  DatabaseHelper db = DatabaseHelper();
+  List<Dish> dishes = [];
 
   @override
   void initState() {
     super.initState();
+    _loadDishes();
     _loadData();
   }
 
-  void _loadData() {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    // 1️⃣ Ca làm việc hôm nay
-    myShiftToday =
-        staffShiftAreas
-            .where(
-              (e) =>
-                  e['chef_id'] == null &&
-                  e['staff_id'] == widget.chefId &&
-                  e['date'] == today,
-            )
-            .toList();
-
-    // 2️⃣ Danh sách món (orderDetails) của bếp
-    myOrderDetails =
-        orderDetails.where((e) => e['chef_id'] == widget.chefId).toList();
+  void _loadDishes() async {
+    dishes = await db.getAllDishes();
+    print("🔍 Món cần chế biến: $myOrderDetails");
+    setState(() {});
   }
 
-  // Chuyển trạng thái vòng đời
-  void _advanceStatus(Map<String, dynamic> item) {
-    setState(() {
-      switch (item['status']) {
-        case 'Đã đặt':
-          item['status'] = 'Đang chế biến';
-          break;
-        case 'Đang chế biến':
-          item['status'] = 'Hoàn thành';
-          break;
-        default:
-          break;
+  void _loadData() async {
+    myOrderDetails = await db.getDishesToPrepare();
+    print("🔍 Món cần chế biến: $myOrderDetails");
+    setState(() {});
+  }
+
+  void _advanceStatus(Map<String, dynamic> item) async {
+    String currentStatus = item['status'];
+    String? newStatus;
+
+    switch (currentStatus) {
+      case 'Chờ xử lý':
+        newStatus = 'Đang chế biến';
+        break;
+      case 'Đang chế biến':
+        newStatus = 'Hoàn thành';
+        break;
+    }
+
+    if (newStatus != null) {
+      await db.updateOrderDetailStatus(item['id'], newStatus);
+
+      _loadData();
+
+      if (newStatus == 'Hoàn thành') {
+        await Future.delayed(const Duration(seconds: 2));
+        await db.updateOrderDetailChef(item['id'], widget.chefId);
+
+        _loadData();
       }
-    });
+    }
   }
 
   Color _statusColor(String s) {
@@ -66,15 +73,17 @@ class _ChefScreenState extends State<ChefScreen> {
     }
   }
 
+  //check
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Màn hình Bếp'),
+        title: const Text('👨‍🍳 Màn hình Bếp'),
+        centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.red],
+              colors: [Colors.deepOrange, Colors.orangeAccent],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -83,107 +92,114 @@ class _ChefScreenState extends State<ChefScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async => setState(_loadData),
-        child: ListView(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
-          children: [
-            /* ------------------- Ca làm việc hôm nay -------------------- */
-            Text(
-              'Ca làm việc hôm nay',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ...myShiftToday.map((shiftArea) {
-              final shift = shifts.firstWhere(
-                (s) => s['id'] == shiftArea['shift_id'],
-              );
-              final table = tables.firstWhere(
-                (t) => t['id'] == shiftArea['table_id'],
-              );
-              return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tiêu đề
+              Text(
+                '🍽️ Món cần chế biến',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
                 ),
-                child: ListTile(
-                  leading: const Icon(Icons.schedule, color: Colors.brown),
-                  title: Text(
-                    '${shift['shiftname']}  (${shift['start_time']} - ${shift['end_time']})',
-                  ),
-                  subtitle: Text(
-                    'Bàn: #${table['id']} (${table['seat_count']} chỗ)',
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 16),
-            /* ------------------- Danh sách món -------------------------- */
-            Text(
-              'Món cần chế biến',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ...myOrderDetails.map((od) {
-              final dish = dishes.firstWhere((d) => d['id'] == od['dish_id']);
-              return Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.brown.shade100,
-                    child: const Icon(
-                      Icons.restaurant_menu,
-                      color: Colors.brown,
+              ),
+              const SizedBox(height: 12),
+
+              // Hiển thị nếu không có món
+              if (myOrderDetails.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 32),
+                  child: Center(
+                    child: Text(
+                      '✅ Hiện không có món nào cần chuẩn bị.',
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ),
-                  title: Text(dish['name']),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Số lượng: ${od['quantity']}'),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Chip(
-                            label: Text(od['status']),
-                            backgroundColor: _statusColor(
-                              od['status'],
-                            ).withOpacity(.15),
-                            labelStyle: TextStyle(
-                              color: _statusColor(od['status']),
-                            ),
-                          ),
-                        ],
+                ),
+
+              // Danh sách món
+              ...myOrderDetails.map((od) {
+                final status = od['status'];
+                final isDone = status == 'Hoàn thành';
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  trailing:
-                      od['status'] == 'Hoàn thành'
-                          ? const Icon(Icons.check_circle, color: Colors.green)
-                          : IconButton(
-                            icon: const Icon(Icons.play_arrow),
-                            color: Colors.orange,
-                            tooltip: 'Chuyển trạng thái',
-                            onPressed: () => _advanceStatus(od),
-                          ),
-                ),
-              );
-            }),
-            if (myOrderDetails.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 32),
-                child: Center(
-                  child: Text(
-                    'Hiện không có món nào cần chuẩn bị.',
-                    style: TextStyle(color: Colors.grey.shade600),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.orange.shade100,
+                        child: const Icon(
+                          Icons.restaurant_menu,
+                          color: Colors.deepOrange,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              od['dish_name'] ?? 'Không rõ tên món',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text('Số lượng: ${od['quantity']}'),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  isDone
+                                      ? Icons.check_circle
+                                      : status == 'Đang chế biến'
+                                      ? Icons.local_fire_department
+                                      : Icons.pending,
+                                  color: _statusColor(status),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  status,
+                                  style: TextStyle(color: _statusColor(status)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isDone)
+                        IconButton(
+                          icon: const Icon(Icons.play_arrow),
+                          color: Colors.orange,
+                          onPressed: () => _advanceStatus(od),
+                          tooltip: 'Chuyển trạng thái',
+                        )
+                      else
+                        const Icon(Icons.check_circle, color: Colors.green),
+                    ],
                   ),
-                ),
-              ),
-          ],
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

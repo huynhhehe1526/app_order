@@ -21,7 +21,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> loadOrderDetails() async {
-    // Gọi hàm async lấy chi tiết món theo order_id
     final details = await db.getOrderDetailsByOrderId(widget.order['id']);
     print('Check detail bên orderdetaiL: $details');
     setState(() {
@@ -80,10 +79,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
             ),
             Divider(),
-            // Text(
-            //   "💵 Tổng cộng: ${order['total']}đ",
-            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            // ),
             Text(
               "💵 Tổng cộng: ${(order['total'] as num).toDouble().toStringAsFixed(2)}đ",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

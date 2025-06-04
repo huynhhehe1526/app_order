@@ -62,7 +62,6 @@ class MyApp extends StatelessWidget {
                   as Map<String, dynamic>;
           return PaymentScreen(order: order);
         },
-        // '/add_order': (context) => AddOrderScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/home') {

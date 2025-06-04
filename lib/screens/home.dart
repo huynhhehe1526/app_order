@@ -234,15 +234,24 @@ class _HomeScreenState extends State<HomeScreen> {
         allowedKeys = allItems.keys.toList(); // tất cả
         break;
       case 'nhân viên':
-      case 'bếp':
         allowedKeys = [
           'Bàn',
           'Thực đơn',
           'Thanh toán',
           'Đặt bàn',
           'Ca làm việc',
+          'Phản hồi của khách hàng',
+          'Cài đặt',
+          'Xem thêm',
+        ];
+        break;
+      case 'bếp':
+        allowedKeys = [
+          'Bàn',
+          'Thực đơn',
+          'Thanh toán',
+          'Ca làm việc',
           'Chế biến món',
-          'Thống kê doanh thu',
           'Phản hồi của khách hàng',
           'Cài đặt',
           'Xem thêm',
@@ -483,21 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       /* --------------------- BOTTOM NAVIGATION ----------------------------- */
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: _selectedIndex,
-      //   onTap: _onItemTapped,
-      //   selectedItemColor: const Color.fromARGB(255, 85, 2, 2),
-      //   unselectedItemColor: Colors.grey,
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang Chủ'),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.menu_book),
-      //       label: 'Thực Đơn',
-
-      //     ),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tài Khoản'),
-      //   ],
-      // ),
+   
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

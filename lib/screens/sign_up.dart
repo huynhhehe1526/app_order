@@ -82,13 +82,12 @@ class _SignupScreenState extends State<SignupScreen> {
       password: _passwordController.text.trim(),
       fullname: _fullnameController.text.trim(),
       role: 'Khách',
-      phone: '',  // hoặc lấy giá trị thực nếu có input số điện thoại
-      email: _emailController.text.trim(), // nếu có trường email
-      address: '',  // nếu có địa chỉ hoặc để trống
+      phone: '',
+      email: _emailController.text.trim(),
+      address: '',
       createdAt: DateTime.now().toIso8601String(),
       updatedAt: DateTime.now().toIso8601String(),
     );
-
 
     await dbHelper.insertUser(newUser);
 
@@ -122,9 +121,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   begin: Alignment.centerRight,
                   end: Alignment.centerLeft,
                   colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.7),
-                    Colors.white,
+                    Colors.black.withOpacity(0.0),
+                    Colors.black.withOpacity(0.7),
+                    Colors.black,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -139,12 +138,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
+                        color: Colors.amber,
                       ),
                     ),
                     // Username
                     TextFormField(
                       controller: _usernameController,
+                      style: const TextStyle(color: Colors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Vui lòng nhập username";
@@ -153,6 +153,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Username',
+                        labelStyle: const TextStyle(
+                          color: Color.fromARGB(255, 173, 129, 17),
+                        ),
                         hintText: 'Nhập username',
                         hintStyle: const TextStyle(color: Colors.black26),
                         border: OutlineInputBorder(
@@ -169,6 +172,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Fullname
                     TextFormField(
                       controller: _fullnameController,
+                      style: const TextStyle(color: Colors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Vui lòng nhập họ và tên";
@@ -177,6 +181,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Fullname',
+                        labelStyle: const TextStyle(
+                          color: Color.fromARGB(255, 173, 129, 17),
+                        ),
                         hintText: 'Nhập họ và tên',
                         hintStyle: const TextStyle(color: Colors.black26),
                         border: OutlineInputBorder(
@@ -193,18 +200,23 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Email
                     TextFormField(
                       controller: _emailController,
+                      style: const TextStyle(color: Colors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Vui lòng nhập email";
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
+                        if (!RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(value)) {
                           return "Email không hợp lệ";
                         }
                         return null;
                       },
                       decoration: InputDecoration(
                         labelText: 'Email',
+                        labelStyle: const TextStyle(
+                          color: Color.fromARGB(255, 173, 129, 17),
+                        ),
                         hintText: 'Nhập email',
                         hintStyle: const TextStyle(color: Colors.black26),
                         border: OutlineInputBorder(
@@ -221,6 +233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Password
                     TextFormField(
                       controller: _passwordController,
+                      style: const TextStyle(color: Colors.white),
                       obscureText: true,
                       obscuringCharacter: '*',
                       validator: (value) {
@@ -231,6 +244,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Password',
+                        labelStyle: const TextStyle(
+                          color: Color.fromARGB(255, 173, 129, 17),
+                        ),
                         hintText: 'Nhập mật khẩu',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -257,7 +273,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         const Text(
                           'Remember me',
-                          style: TextStyle(color: Colors.black45),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
@@ -274,7 +290,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('Đăng ký', style: TextStyle(fontSize: 18)),
+                      child: const Text(
+                        'Đăng ký',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ),
                   ],
                 ),

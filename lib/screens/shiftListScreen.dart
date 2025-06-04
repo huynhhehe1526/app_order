@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 enum ShiftStatus { upcoming, ongoing, ended }
 
 class ShiftListScreen extends StatefulWidget {
-  /// Nếu truyền role → xem theo role (dành cho Quản lý)
   final String? role;
-
-  /// Nếu truyền userId → xem ca của chính nhân viên
   final int? userId;
 
   const ShiftListScreen({this.role, this.userId, super.key});
@@ -27,16 +24,6 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
     _future = _load();
   }
 
-  // Future<List<Registrationshift>> _load() async {
-  //   if (widget.userId != null) {
-  //     final rows = await db.getTodayShiftsByStaff(widget.userId!);
-  //     return rows.map((e) => Registrationshift.fromMap(e)).toList();
-  //   } else {
-  //     final rows = await DatabaseHelper().getTodayShiftsByRole(widget.role!);
-  //     return rows.map((e) => Registrationshift.fromMap(e)).toList();
-  //   }
-  // }
-
   Future<List<Registrationshift>> _load() async {
     try {
       if (widget.userId != null) {
@@ -50,7 +37,7 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
       }
     } catch (e) {
       print('Lỗi khi load dữ liệu: $e');
-      return []; // Trả về danh sách rỗng thay vì để treo
+      return [];
     }
   }
 
@@ -79,33 +66,6 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
     if (!afterStart) return ShiftStatus.upcoming;
     return ShiftStatus.ended;
   }
-
-  // bool isCurrentShift(String start, String end) {
-  //   String fixTimeFormat(String time) {
-  //     return time.replaceAll('h', ':');
-  //   }
-
-  //   final now = TimeOfDay.now();
-
-  //   TimeOfDay parseTime(String time) {
-  //     time = fixTimeFormat(time);
-  //     final parts = time.split(':');
-  //     return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-  //   }
-
-  //   TimeOfDay startTime = parseTime(start);
-  //   TimeOfDay endTime = parseTime(end);
-
-  //   bool afterStart =
-  //       (now.hour > startTime.hour) ||
-  //       (now.hour == startTime.hour && now.minute >= startTime.minute);
-  //   bool beforeEnd =
-  //       (now.hour < endTime.hour) ||
-  //       (now.hour == endTime.hour && now.minute <= endTime.minute);
-
-  //   return afterStart && beforeEnd;
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,7 +107,6 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
 
               return GestureDetector(
                 onTap: () {
-                  // mở chi tiết ca làm nếu muốn
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 8),
@@ -238,15 +197,10 @@ class _ShiftListScreenState extends State<ShiftListScreen> {
                   ),
                 ),
           );
-
-          // if (didSave == true) {
-          //   // load lại dữ liệu
-          //   setState(() => _future = _load());
-          // }
           if (didSave == true) {
             setState(() {
               _future =
-                  _load(); // vẫn gọi hàm async, nhưng callback returns void
+                  _load(); 
             });
           }
         },

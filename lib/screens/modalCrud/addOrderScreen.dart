@@ -1,5 +1,3 @@
-//test chọn món bên menu
-//test db
 import 'package:dt02_nhom09/class/area.dart';
 import 'package:dt02_nhom09/class/listFood.dart';
 import 'package:dt02_nhom09/class/order_detail.dart';
@@ -10,7 +8,6 @@ import 'package:dt02_nhom09/db/db_helper.dart';
 import 'package:dt02_nhom09/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
-// import '../data/mock_data.dart';
 import 'package:dt02_nhom09/screens/order_mode.dart';
 
 class AddOrderScreen extends StatefulWidget {
@@ -46,6 +43,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   /* ---------- flag & dữ liệu riêng cho staff ---------- */
   late final bool isStaff;
   late final bool isManage;
+  late final bool isCustomer;
   int? staffId;
   // List<Map<String, dynamic>> staffTables = [];
   Set<int> staffTables = {};
@@ -67,6 +65,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
     print('Check id: ${widget.id}, Name:${widget.name}, role: ${widget.role}');
     isStaff = widget.role == 'Nhân viên';
     isManage = widget.role == 'Quản lý';
+    isCustomer = widget.role == 'Khách';
     _loadAreas();
     _loadDishes();
     // printStaffShifts();
@@ -134,64 +133,6 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
 
   String? selectedAreaName;
 
-  //đăng ký nhiều lịch
-  // void checkStaffSchedule(int staffId) async {
-  //   final dataList = await db.getTodayScheduleAndArea(staffId);
-
-  //   if (dataList != null && dataList.isNotEmpty) {
-  //     // Ví dụ xử lý ca làm đầu tiên (hoặc bạn có thể xử lý tất cả)
-  //     for (var data in dataList) {
-  //       print('Ca: ${getShiftName(data['start_time'], data['end_time'])}');
-  //       print('Giờ bắt đầu: ${data['start_time']}');
-  //       print('Giờ kết thúc: ${data['end_time']}');
-  //       print('Ngày đăng ký: ${data['created_at']}');
-  //       print('Khu vực: ${data['area_name']}');
-
-  //       int areaId = data['area_id'];
-  //       int tableId = data['table_id'];
-
-  //       Area? area = await db.getAreaById(areaId);
-  //       if (area != null) {
-  //         _listAreas = [area];
-  //         staffAreas = {area.id!};
-  //         if (staffAreas.length == 1) selectedAreaId = staffAreas.first;
-  //       } else {
-  //         _listAreas = [];
-  //         staffAreas = {};
-  //       }
-
-  //       // Lấy bàn theo id
-  //       TableModel? table = await db.getTableById(tableId);
-
-  //       if (table != null) {
-  //         _listTables = [table];
-  //         staffTables = {table.id!};
-  //         if (staffTables.length == 1) selectedTableId = staffTables.first;
-  //       } else {
-  //         _listTables = [];
-  //         staffTables = {};
-  //       }
-
-  //       print('Bàn số: ${table?.id ?? 'Không có'}');
-
-  //       print('--------------------'); // Dòng phân cách giữa các ca
-  //     }
-  //   } else {
-  //     print('Hôm nay bạn không có ca làm hoặc không trong thời gian ca.');
-  //   }
-  // }
-
-  // void printStaffShifts() async {
-  //   final shifts = await DatabaseHelper().getShiftsOfStaff(3);
-  //   for (var shift in shifts) {
-  //     print('Ca: ${shift['shiftname']}');
-  //     print('Giờ bắt đầu: ${shift['start_time']}');
-  //     print('Giờ kết thúc: ${shift['end_time']}');
-  //     print('Ngày đăng ký: ${shift['created_at']}');
-  //     print('---');
-  //   }
-  // }
-
   //show all areas
   Future<void> _loadAreas() async {
     // ← thêm hàm
@@ -218,16 +159,6 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
     final nn = n.hour * 60 + n.minute;
     return ee < ss ? (nn >= ss || nn <= ee) : (nn >= ss && nn <= ee);
   }
-
-  // int? _currentShiftId() {
-  //   final now = TimeOfDay.now();
-  //   for (final s in shifts) {
-  //     if (_inRange(_parse(s['start_time']), _parse(s['end_time']), now)) {
-  //       return s['id'] as int;
-  //     }
-  //   }
-  //   return null;
-  // }
 
   /* ------------------------------------------------------------------ */
   /*                         FILTER TABLES                              */
@@ -264,106 +195,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   /*                          BUILD UI                                  */
   /* ------------------------------------------------------------------ */
   @override
-  // Widget build(BuildContext context) {
-  //   final isCustomer = widget.role == "Khách";
-  //   final isManage = widget.role == 'Quản lý';
-  //   return Scaffold(
-  //     appBar: AppBar(title: const Text('Tạo đơn hàng mới')),
-  //     body: Column(
-  //       children: [
-  //         /* ---------- CHỌN KHU VỰC & BÀN ---------- */
-  //         if (!isStaff) ...[
-  //           /* -- Khách / quản lý: tùy chọn đầy đủ -- */
-  //           _areaDropdown(_listAreas.map((a) => a.id as int).toList()),
-  //           const SizedBox(height: 10),
-  //           _tableDropdown(),
-  //           const SizedBox(height: 10),
-  //           _timePickerRow(), // khách chọn giờ
-  //           const Divider(),
-  //         ] else ...[
-  //           /* -- Nhân viên: chỉ khu vực/bàn trong ca -- */
-  //           // _areaDropdown(staffAreas.toList()),
-  //           _areaDropdown(
-  //             isStaff
-  //                 ? staffAreas.toList()
-  //                 : _listAreas.map((a) => a.id!).toList(),
-  //           ),
-  //           const SizedBox(height: 10),
-  //           _tableDropdown(),
-  //           TextField(
-  //             controller: _customerNameController,
-  //             decoration: const InputDecoration(
-  //               labelText: 'Họ tên khách',
-  //               border: OutlineInputBorder(),
-  //             ),
-  //           ),
-  //           const SizedBox(height: 10),
-  //           TextField(
-  //             controller: _customerPhoneController,
-  //             keyboardType: TextInputType.phone,
-  //             decoration: const InputDecoration(
-  //               labelText: 'Số điện thoại khách',
-  //               border: OutlineInputBorder(),
-  //             ),
-  //           ),
-  //           const SizedBox(height: 10),
-  //           const Divider(),
-  //         ],
-  //         /* ---------- GHI CHÚ ---------- */
-  //         TextField(
-  //           controller: _noteController,
-  //           decoration: const InputDecoration(
-  //             labelText: 'Ghi chú đơn hàng',
-  //             border: OutlineInputBorder(),
-  //           ),
-  //           maxLines: 2,
-  //         ),
-  //         const SizedBox(height: 20),
-  //         /* ---------- CHỌN MÓN ---------- */
-  //         const Text('Chọn món', style: TextStyle(fontWeight: FontWeight.bold)),
-  //         // ...listDishes.map(_dishTile),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             final dishes = await Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (_) => MenuScreen(role: widget.role),
-  //               ),
-  //             );
-  //             if (dishes != null && mounted) {
-  //               setState(() => _selectedDishes = dishes);
-  //             }
-  //           },
-  //           child: Text("Chọn món"),
-  //         ),
-  //         // Expanded(
-  //         //   child: ListView(children: _selectedDishes.map(_dishTile).toList()),
-  //         // ),
-  //         Expanded(
-  //           child:
-  //               _selectedDishes.isEmpty
-  //                   ? const Center(child: Text('Chưa chọn món'))
-  //                   : ListView(
-  //                     children: _selectedDishes.map(_dishTile).toList(),
-  //                   ),
-  //         ),
-  //         const SizedBox(height: 20),
-  //         ElevatedButton.icon(
-  //           onPressed: _submitOrder,
-  //           //_canSubmit ? _submitOrder : null,
-  //           icon: const Icon(Icons.check),
-  //           label: const Text('Xác nhận tạo đơn'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //test ui
-  @override
   Widget build(BuildContext context) {
-    final isCustomer = widget.role == "Khách";
-    final isManage = widget.role == 'Quản lý';
-
     return Scaffold(
       appBar: AppBar(title: const Text('Tạo đơn hàng mới')),
       body: Padding(
@@ -371,7 +203,47 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
         child: Column(
           children: [
             /* ---------- KHÁCH / NHÂN VIÊN / QUẢN LÝ ---------- */
-            if (!isStaff) ...[
+            if (isManage) ...[
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: [
+                      _areaDropdown(
+                        _listAreas.map((a) => a.id as int).toList(),
+                      ),
+                      const SizedBox(height: 10),
+                      _tableDropdown(),
+                      const SizedBox(height: 10),
+                      _timePickerRow(),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _customerNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Họ tên khách',
+                          prefixIcon: Icon(Icons.person_outline),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _customerPhoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: const InputDecoration(
+                          labelText: 'Số điện thoại khách',
+                          prefixIcon: Icon(Icons.phone),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ] else if (isCustomer) ...[
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -656,106 +528,21 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
         _selectedDishes.any((dish) => dish.quantity > 0);
   }
 
-  // bool get _canSubmit {
-  //   return selectedAreaId != null &&
-  //       selectedTableId != null &&
-  //       _selectedDishes.isNotEmpty;
-  // }
-
-  // void _submitOrder() async {
-  //   final now = DateTime.now();
-
-  //   // final total = _selectedDishes.entries.fold<int>(0, (s, e) {
-  //   //   final price = int.parse(
-  //   //     listDishes.firstWhere((d) => d['name'] == e.key)['price'],
-  //   //   );
-  //   //   return s + price * e.value;
-  //   // });
-  //   // final total = _selectedDishes.entries.fold<double>(0.0, (sum, entry) {
-  //   //   final dish = listDishes.firstWhere((d) => d.name == entry.key);
-  //   //   return sum + dish.price * entry.value;
-  //   // });
-  //   final total = _selectedDishes.entries.fold<double>(0.0, (sum, entry) {
-  //     final dish = listDishes.firstWhere(
-  //       (d) => d.name == entry.key,
-  //       orElse: () => throw Exception('Không tìm thấy món: ${entry.key}'),
-  //     );
-  //     return sum + dish.price * entry.value;
-  //   });
-
-  //   final order = Order(
-  //     id: 0, // Sẽ được auto-gen bởi DB, bỏ qua khi insert
-  //     customer_id: null,
-  //     customerName:
-  //         isStaff
-  //             ? _customerNameController.text.trim()
-  //             : (widget.role == 'Khách' ? widget.name : ''),
-  //     staffId:
-  //         isStaff
-  //             ? widget.id
-  //             : null, // Giả sử staffId là 1, bạn thay bằng thực tế
-  //     staffName: isStaff ? widget.name : '',
-  //     table_id: selectedTableId!,
-  //     areaName: selectedAreaName!,
-  //     status: 'Chờ xử lý',
-  //     totalAmount: total.round(),
-  //     note: _noteController.text.trim(),
-  //     createdAt: now,
-  //     updatedAt: now,
-  //   );
-
-  //   final orderDetails =
-  //       _selectedDishes.entries.where((e) => e.value > 0).map((e) {
-  //         final dishId = dishes.firstWhere((d) => d['name'] == e.key)['id'];
-  //         return OrderDetail(
-  //           orderId: null, // sẽ set sau khi có orderId
-  //           dishId: dishId,
-  //           quantity: e.value,
-  //           status: 'Chờ xử lý',
-  //           chefId: null,
-  //           createdAt: now.toIso8601String(),
-  //           updatedAt: now.toIso8601String(),
-  //         );
-  //       }).toList();
-
-  //   try {
-  //     final orderId = await db.insertOrder(order);
-
-  //     for (var detail in orderDetails) {
-  //       detail.orderId = orderId;
-  //     }
-
-  //     await db.insertOrderDetails(orderDetails);
-
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text('Đặt món thành công!')));
-
-  //     Navigator.pop(context); // hoặc truyền lại order nếu cần
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text('Lỗi đặt món: $e')));
-  //   }
-  // }
-
   void _submitOrder() async {
     final now = DateTime.now();
 
     try {
-      // 1. Xử lý khách hàng (nếu là nhân viên đặt)
       int? customerId;
-      if (isStaff && _customerNameController.text.trim().isNotEmpty) {
+      if ((isStaff || isManage) &&
+          _customerNameController.text.trim().isNotEmpty) {
         final customerName = _customerNameController.text.trim();
         final customerPhone = _customerPhoneController.text.trim();
 
-        // Tìm xem khách hàng đã tồn tại trong DB chưa
         final existingUser = await db.findUserBySDT(customerPhone);
 
         if (existingUser != null) {
           customerId = existingUser.id;
         } else {
-          // Nếu chưa tồn tại, thêm mới vào bảng Users
           final newUser = User(
             username: '',
             password: '',
@@ -770,73 +557,18 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
         }
       }
 
-      // 2. Tính tổng tiền đơn hàng (giá * số lượng)
-
       final total = _selectedDishes.fold<double>(
         0.0,
         (sum, dish) => sum + dish.price * dish.quantity,
       );
 
       print('Tổng tiền: $total');
-      // 3. Tạo đơn hàng (Order)
-      // final order = Order(
-      //   id: 0, // sẽ được auto tăng
-      //   customer_id: customerId,
-      //   customerName: '',
-      //   staffId: isStaff ? widget.id : null,
-      //   staffName: isStaff ? widget.name : '',
-      //   table_id: selectedTableId!,
-      //   areaName: selectedAreaName!,
-      //   status: 'Chờ xử lý',
-      //   totalAmount: total.round(),
-      //   note: _noteController.text.trim(),
-      //   createdAt: now,
-      //   updatedAt: now,
-      // );
 
-      // // 4. Chi tiết đơn hàng (OrderDetail)
-      // print('Check add order bên addorderscreen: $order');
-      // final orderDetails =
-      //     _selectedDishes.entries
-      //         .where((e) => e.value > 0)
-      //         .map((e) {
-      //           final matched =
-      //               listDishes.where((d) => d.name == e.key).toList();
-      //           if (matched.isEmpty) {
-      //             print('Không tìm thấy món: ${e.key}');
-      //             return null;
-      //           }
-      //           final dish = matched.first;
-      //           print('Dữ liệu trong bảng order detail');
-      //           print('Món đặt: ${e.key}');
-      //           print('Dish id: ${dish.id}');
-      //           return OrderDetail(
-      //             orderId: null,
-      //             dishId: dish.id,
-      //             quantity: e.value,
-      //             status: 'Chờ xử lý',
-      //             chefId: null,
-      //             createdAt: now.toIso8601String(),
-      //             updatedAt: now.toIso8601String(),
-      //           );
-      //         })
-      //         .whereType<OrderDetail>()
-      //         .toList();
-      // print('Check orderDetails ở add order screen: $orderDetails');
-      // // 5. Lưu vào DB
-      // final orderId = await db.insertOrder(order);
-      // for (var detail in orderDetails) {
-      //   detail.orderId = orderId;
-      // }
-      // await db.insertOrderDetails(orderDetails);
-
-      //test
-      // 3. Tạo đơn hàng (Order)
       final order = Order(
         id: 0, // auto-increment
-        customer_id: customerId,
+        customer_id: isCustomer ? widget.id : customerId,
         customerName: '',
-        staffId: isStaff ? widget.id : null,
+        staffId: isStaff || isManage ? widget.id : null,
         staffName: isStaff ? widget.name : '',
         table_id: selectedTableId!,
         areaName: selectedAreaName!,
@@ -885,7 +617,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
       print('✅ OrderDetails đã được lưu xong.');
       print('👉 Insert từng OrderDetail:');
       for (var d in orderDetails) {
-        print('map${d.toMap()}'); // Hoặc in từng field rõ ràng hơn
+        print('map${d.toMap()}');
       }
 
       final savedDetails = await db.getOrderDetailsByOrderId(orderId);
@@ -895,12 +627,9 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
           ' - dish_name: ${d['dish_name']}, quantity: ${d['quantity']}, status: ${d['status']}, chef_name: ${d['chef_name']}',
         );
       }
-
-      // 6. Thông báo thành công
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Đặt món thành công!')));
-      // Navigator.pop(context, orderId);
       Navigator.pop(context, orderId);
     } catch (e) {
       // Báo lỗi

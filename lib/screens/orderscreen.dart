@@ -55,10 +55,8 @@ class _OrderScreenState extends State<OrderScreen> {
         filteredOrders = [];
       }
 
-      // Chuyển đổi sang dạng dữ liệu cần hiển thị (thêm details nếu có)
       displayOrders =
           filteredOrders.map((o) {
-            // Lấy chi tiết order của order này từ orderDetails
             final details =
                 orderDetails
                     .where((d) => d['order_id'] == o['id'])
@@ -93,11 +91,6 @@ class _OrderScreenState extends State<OrderScreen> {
       isLoading = false;
     });
   }
-
-  // Future<void> getAllOrderInforDetailById(int idOrder) async {
-  //   order_new = await db.getOrderWithUserInfoByIdOrder(idOrder);
-  // }
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -118,13 +111,6 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ),
 
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () async {
-        //     // Xử lý thêm đơn mới, tương tự như bạn làm
-        //   },
-        //   tooltip: "Thêm đơn hàng",
-        //   child: const Icon(Icons.add),
-        // ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Xác định mode theo role
@@ -211,7 +197,6 @@ class _OrderScreenState extends State<OrderScreen> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        // cập nhật trạng thái hoặc xử lý gì đó
                       },
                       child: Text("Cập nhật"),
                     ),
@@ -277,16 +262,6 @@ class _OrderScreenState extends State<OrderScreen> {
               mode = OrderMode.staffWalkIn;
             }
 
-            // final newOrder = await Navigator.pushNamed(
-            //   context,
-            //   '/add_order',
-            //   arguments: {
-            //     'mode': mode,
-            //     'name': widget.name,
-            //     'role': widget.role,
-            //   },
-            // );
-
             print("OrderScreen: name = ${widget.name}");
             final newOrder = await Navigator.push(
               context,
@@ -302,43 +277,7 @@ class _OrderScreenState extends State<OrderScreen> {
             );
 
             print('Check order mới bên orderscreen $newOrder');
-
-            if (newOrder != null && newOrder is int) {
-              final orderInfo = await db.getOrderById(
-                newOrder,
-              ); // Map<String, dynamic>?
-              print('Order info: $orderInfo');
-              if (orderInfo != null) {
-                final orderDetails = await db.getOrderDetailsByOrderId(
-                  newOrder,
-                ); // List<Map<String,dynamic>>
-                print('Order details: $orderDetails');
-                final fullOrder = {...orderInfo, 'details': orderDetails};
-                setState(() {
-                  displayOrders.add(fullOrder);
-                });
-                print('DisplayOrders: $displayOrders');
-              }
-            }
-
-            final orderDt = await db.getOrderDetailsByOrderId(newOrder);
-            print('Check order detail bên orderscreen: $orderDt');
-            // if (newOrder != null && newOrder is Map<String, dynamic>) {
-            //   setState(() {
-            //     final newId =
-            //         displayOrders.isNotEmpty
-            //             ? (displayOrders.last['id'] as int)
-            //             : 1;
-            //     newOrder['id'] = newId;
-
-            //     // if (newOrder['details'] == null ||
-            //     //     newOrder['details'] is! List) {
-            //     //   newOrder['details'] = [];
-            //     // }
-
-            //     displayOrders.add(newOrder);
-            //   });
-            // }
+            loadOrders();
           }
         },
         tooltip: "Thêm đơn hàng",
