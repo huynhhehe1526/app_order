@@ -120,7 +120,6 @@ class _ChefScreenState extends State<ChefScreen> {
                   ),
                 ),
 
-              // Danh sách món
               ...myOrderDetails.map((od) {
                 final status = od['status'];
                 final isDone = status == 'Hoàn thành';
@@ -154,6 +153,17 @@ class _ChefScreenState extends State<ChefScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // 👇 Hiển thị mã đơn hàng
+                            Text(
+                              'Đơn hàng #${od['orderId'] ?? '??'}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepOrange,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+
+                            // 👇 Tên món
                             Text(
                               od['dish_name'] ?? 'Không rõ tên món',
                               style: const TextStyle(
@@ -162,8 +172,26 @@ class _ChefScreenState extends State<ChefScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
+
+                            // 👇 Số lượng
                             Text('Số lượng: ${od['quantity']}'),
+
+                            // 👇 Ghi chú nếu có
+                            if (od['note'] != null &&
+                                od['note'].toString().trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  '📝 Ghi chú: ${od['note']}',
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+
                             const SizedBox(height: 4),
+
+                            // 👇 Trạng thái
                             Row(
                               children: [
                                 Icon(

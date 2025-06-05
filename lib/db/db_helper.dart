@@ -1059,15 +1059,34 @@ class DatabaseHelper {
 
   //show dishes prepare
 
+  // Future<List<Map<String, dynamic>>> getDishesToPrepare() async {
+  //   final db = await database;
+  //   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  //   final result = await db.rawQuery(
+  //     '''
+  //   SELECT od.id, d.name AS dish_name, od.quantity, od.status
+  //   FROM OrderDetail od
+  //   JOIN Dishes d ON od.dish_id = d.id
+  //   WHERE DATE(od.created_at) = ?
+  //     AND od.chef_id IS NULL
+  //   ''',
+  //     [today],
+  //   );
+
+  //   return result;
+  // }
+
   Future<List<Map<String, dynamic>>> getDishesToPrepare() async {
     final db = await database;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     final result = await db.rawQuery(
       '''
-    SELECT od.id, d.name AS dish_name, od.quantity, od.status
+    SELECT od.id, d.name AS dish_name, od.quantity, od.status, o.note as note, o.id as orderId
     FROM OrderDetail od
     JOIN Dishes d ON od.dish_id = d.id
+    JOIN Orders o ON od.order_id = o.id
     WHERE DATE(od.created_at) = ?
       AND od.chef_id IS NULL
     ''',
