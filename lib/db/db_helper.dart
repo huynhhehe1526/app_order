@@ -311,7 +311,7 @@ class DatabaseHelper {
         //shifts
         await db.insert('Shifts', {
           'shiftname': 'Ca sáng',
-          'start_time': '8:00',
+          'start_time': '08:00',
           'end_time': '13:00',
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),

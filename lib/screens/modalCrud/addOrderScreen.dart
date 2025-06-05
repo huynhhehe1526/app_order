@@ -420,7 +420,10 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
             ElevatedButton.icon(
               onPressed: _submitOrder,
               icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Xác nhận tạo đơn'),
+              label: const Text(
+                'Xác nhận đặt bàn',
+                style: TextStyle(color: Colors.white),
+              ),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
                 backgroundColor: Colors.teal,

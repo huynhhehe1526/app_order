@@ -90,6 +90,7 @@ class _TableScreenState extends State<TableScreen>
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
+                  unselectedLabelColor: Colors.white.withOpacity(0.6),
                   tabs: _areas.map((e) => Tab(text: e.name)).toList(),
                 ),
       ),
